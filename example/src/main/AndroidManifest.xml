@@ -18,6 +18,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
+        <activity android:name="me.shaohui.shareutil.share.WXEntryParent"/>
+        <activity-alias
+                android:name=".wxapi.WXPayEntryActivity"
+                android:exported="true"
+                android:targetActivity="me.shaohui.shareutil.share.WXEntryParent"/>
     </application>
 
 </manifest>
