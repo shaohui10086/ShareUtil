@@ -8,7 +8,6 @@ import java.io.File;
 import me.shaohui.shareutil.R;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
-import me.shaohui.shareutil.share.ShareInstance;
 import me.shaohui.shareutil.share.ShareListener;
 import rx.Emitter;
 import rx.Observable;

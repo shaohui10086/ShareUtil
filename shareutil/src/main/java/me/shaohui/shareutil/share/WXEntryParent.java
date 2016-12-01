@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
-import me.shaohui.shareutil.VistaShareUtil;
+import me.shaohui.shareutil.ShareUtil;
 
 /**
  * Created by shaohui on 2016/11/19.
@@ -26,16 +26,16 @@ public class WXEntryParent extends Activity implements IWXAPIEventHandler {
 
     @Override
     public void onResp(BaseResp baseResp) {
-        if (VistaShareUtil.mShareListener != null) {
+        if (ShareUtil.mShareListener != null) {
             switch (baseResp.errCode) {
                 case BaseResp.ErrCode.ERR_SENT_FAILED:
-                    VistaShareUtil.mShareListener.shareFailure();
+                    ShareUtil.mShareListener.shareFailure();
                     break;
                 case BaseResp.ErrCode.ERR_OK:
-                    VistaShareUtil.mShareListener.shareSuccess();
+                    ShareUtil.mShareListener.shareSuccess();
                     break;
                 case BaseResp.ErrCode.ERR_USER_CANCEL:
-                    VistaShareUtil.mShareListener.shareCancel();
+                    ShareUtil.mShareListener.shareCancel();
             }
         }
         finish();

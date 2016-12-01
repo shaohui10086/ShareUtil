@@ -13,7 +13,6 @@ import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
-import me.shaohui.shareutil.share.ShareInstance;
 import me.shaohui.shareutil.share.ShareListener;
 import rx.Emitter;
 import rx.Observable;

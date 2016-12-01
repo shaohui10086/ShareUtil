@@ -2,7 +2,6 @@ package me.shaohui.shareutil.share.share_instance;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import com.tencent.connect.share.QQShare;
@@ -13,7 +12,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
-import me.shaohui.shareutil.share.ShareInstance;
 import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
 import rx.Observable;
