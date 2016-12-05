@@ -19,11 +19,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="me.shaohui.shareutil.share.WXEntryParent"/>
+        <activity android:name="me.shaohui.shareutil.WXEntryParent"/>
         <activity-alias
                 android:name=".wxapi.WXPayEntryActivity"
                 android:exported="true"
-                android:targetActivity="me.shaohui.shareutil.share.WXEntryParent"/>
+                android:targetActivity="me.shaohui.shareutil.WXEntryParent"/>
     </application>
 
 </manifest>

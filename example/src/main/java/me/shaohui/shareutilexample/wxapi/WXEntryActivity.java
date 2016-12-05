@@ -1,7 +1,7 @@
 package me.shaohui.shareutilexample.wxapi;
 
 import com.tencent.mm.sdk.modelbase.BaseResp;
-import me.shaohui.shareutil.share.WXEntryParent;
+import me.shaohui.shareutil.WXEntryParent;
 
 /**
  * Created by shaohui on 2016/12/1.

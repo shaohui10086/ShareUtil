@@ -15,6 +15,8 @@ import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import com.tencent.tauth.Tencent;
 import java.lang.ref.WeakReference;
 import java.util.List;
+import me.shaohui.shareutil.login.LoginListener;
+import me.shaohui.shareutil.login.instance.WeiboLoginInstance;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.share_instance.ShareInstance;
 import me.shaohui.shareutil.share.ShareListener;
@@ -37,11 +39,17 @@ public class ShareUtil {
      * 3. 文字长度限制
      */
 
-    private static String WX_ID;
+    public static String WX_ID;
 
-    private static String QQ_ID;
+    public static String WX_SECRET;
+
+    public static String QQ_ID;
 
     private static String WEIBO_ID;
+
+    private static String WEIBO_REDIRECT_URL;
+
+    private static String WEIBO_SCOPE;
 
     private WeakReference<Activity> mActivityWeakReference;
 
@@ -62,8 +70,54 @@ public class ShareUtil {
         WEIBO_ID = id;
     }
 
+    public static void setWxSecret(String wxSecret) {
+        WX_SECRET = wxSecret;
+    }
+
+    public static String getWeiboId() {
+        return WEIBO_ID;
+    }
+
+    public static String getWxId() {
+        return WX_ID;
+    }
+
+    public static String getWxSecret() {
+        return WX_SECRET;
+    }
+
+    public static String getQQId() {
+        return QQ_ID;
+    }
+
+    public static String getWeiboScope() {
+        if (TextUtils.isEmpty(WEIBO_SCOPE)) {
+            WEIBO_SCOPE = WeiboLoginInstance.DEFAULT_SCOPE;
+        }
+        return WEIBO_SCOPE;
+    }
+
+    public static void setWeiboScope(String weiboScope) {
+        WEIBO_SCOPE = weiboScope;
+    }
+
+    public static void setWeiboRedirectUrl(String weiboRedirectUrl) {
+        WEIBO_REDIRECT_URL = weiboRedirectUrl;
+    }
+
+    public static String getWeiboRedirectUrl() {
+        if (TextUtils.isEmpty(WEIBO_REDIRECT_URL)) {
+            WEIBO_REDIRECT_URL = WeiboLoginInstance.DEFAULT_REDIRECT_URL;
+        }
+        return WEIBO_REDIRECT_URL;
+    }
+
     public static void setShareListener(ShareListener listener) {
         mShareListener = listener;
+    }
+
+    public static ShareListener getShareListener() {
+        return mShareListener;
     }
 
     private ShareUtil(Activity activity) {
