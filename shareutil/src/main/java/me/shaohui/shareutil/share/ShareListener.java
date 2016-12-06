@@ -18,7 +18,7 @@ public abstract class ShareListener implements IUiListener, IWeiboHandler.Respon
 
     @Override
     public void onError(UiError uiError) {
-        shareFailure();
+        shareFailure(new Exception(uiError.errorDetail));
     }
 
     @Override
@@ -33,7 +33,7 @@ public abstract class ShareListener implements IUiListener, IWeiboHandler.Respon
                 shareSuccess();
                 break;
             case WBConstants.ErrorCode.ERR_FAIL:
-                shareFailure();
+                shareFailure(new Exception(baseResponse.errMsg));
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
                 shareCancel();
@@ -43,7 +43,7 @@ public abstract class ShareListener implements IUiListener, IWeiboHandler.Respon
 
     public abstract void shareSuccess();
 
-    public abstract void shareFailure();
+    public abstract void shareFailure(Exception e);
 
     public abstract void shareCancel();
 

@@ -2,7 +2,6 @@ package me.shaohui.shareutil.login;
 
 import android.app.Activity;
 import android.content.Intent;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
 import me.shaohui.shareutil.login.instance.LoginInstance;
 import me.shaohui.shareutil.login.instance.QQLoginInstance;
 import me.shaohui.shareutil.login.instance.WeiboLoginInstance;
@@ -16,11 +15,22 @@ public class LoginUtil {
 
     private static LoginInstance mLoginInstance;
 
-    public static void login(Activity activity, int platform, LoginListener listener) {
+    /**
+     * 调用第三方登录
+     *
+     * @param activity 接收回调的activity
+     * @param platform 登录的平台QQ, WEIBO, WX
+     */
+    public static void login(Activity activity, @LoginPlatform.Platform int platform,
+            LoginListener listener) {
         login(activity, platform, listener, true);
     }
 
-    public static void login(Activity activity, int platform, LoginListener listener, boolean fetchUserInfo) {
+    /**
+     * @param fetchUserInfo 是否登录成功以后获取用户信息
+     */
+    public static void login(Activity activity, @LoginPlatform.Platform int platform,
+            LoginListener listener, boolean fetchUserInfo) {
         switch (platform) {
             case LoginPlatform.QQ:
                 mLoginInstance = new QQLoginInstance(activity, listener, fetchUserInfo);
@@ -36,14 +46,15 @@ public class LoginUtil {
     }
 
     public static void handleResult(int requestCode, int resultCode, Intent data) {
-        mLoginInstance.handleResult(requestCode, resultCode, data);
-    }
-
-    public static void handleWxResult(SendAuth.Resp resp) {
-        if (mLoginInstance instanceof WxLoginInstance) {
-            mLoginInstance.handleWxResult(resp);
+        if (mLoginInstance != null) {
+            mLoginInstance.handleResult(requestCode, resultCode, data);
         }
     }
 
-
+    public static void recycle() {
+        if (mLoginInstance != null) {
+            mLoginInstance.recycle();
+        }
+        mLoginInstance = null;
+    }
 }

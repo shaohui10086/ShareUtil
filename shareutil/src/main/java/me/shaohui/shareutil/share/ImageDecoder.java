@@ -3,6 +3,7 @@ package me.shaohui.shareutil.share;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,11 +12,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.BufferedSink;
+import okio.Okio;
 
 /**
  * Created by shaohui on 2016/11/19.
@@ -84,10 +88,9 @@ public class ImageDecoder {
         Request request = new Request.Builder().url(url).build();
         try {
             Response response = client.newCall(request).execute();
-            InputStream inputStream = response.body().byteStream();
-            FileOutputStream outputStream = new FileOutputStream(resultFile, false);
-
-            copyFile(inputStream, outputStream);
+            BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+            sink.writeAll(response.body().source());
+            sink.close();
 
             return resultFile.getAbsolutePath();
         } catch (IOException e) {
@@ -97,7 +100,7 @@ public class ImageDecoder {
     }
 
     private static File cacheFile(Context context) {
-        return new File(context.getExternalFilesDir(null), "ShareFile.jpg");
+        return new File(context.getExternalFilesDir(null), "share_image.jpg");
     }
 
     private static void copyFile(InputStream inputStream, OutputStream outputStream) {

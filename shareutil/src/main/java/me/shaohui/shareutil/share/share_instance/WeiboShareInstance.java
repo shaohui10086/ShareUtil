@@ -121,8 +121,7 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        listener.shareFailure();
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }

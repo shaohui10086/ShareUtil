@@ -105,8 +105,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        listener.shareFailure();
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -158,8 +157,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        listener.shareFailure();
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -171,6 +169,7 @@ public class WxShareInstance implements ShareInstance {
         req.scene = platform == SharePlatform.WX_TIMELINE ? SendMessageToWX.Req.WXSceneTimeline
                 : SendMessageToWX.Req.WXSceneSession;
         mIWXAPI.sendReq(req);
+        mIWXAPI.detach();
     }
 
     private String buildTransaction(String type) {

@@ -2,13 +2,13 @@ package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
 import android.content.Intent;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import java.io.IOException;
-import me.shaohui.shareutil.ShareUtil;
+import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.login.LoginListener;
+import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
 import me.shaohui.shareutil.login.result.BaseToken;
 import me.shaohui.shareutil.login.result.QQToken;
@@ -43,14 +43,14 @@ public class QQLoginInstance extends LoginInstance {
     public QQLoginInstance(Activity activity, final LoginListener listener,
             final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        mTencent = Tencent.createInstance(ShareUtil.getQQId(), activity);
+        mTencent = Tencent.createInstance(ShareManager.QQ_ID, activity.getApplicationContext());
         mLoginListener = listener;
         mIUiListener = new IUiListener() {
             @Override
             public void onComplete(Object o) {
                 QQToken token = QQToken.parse((JSONObject) o);
                 if (token == null) {
-                    mLoginListener.loginFailure(new Exception("login_failure"));
+                    mLoginListener.doLoginFailure(new Exception("login_failure"));
                     return;
                 }
 
@@ -58,7 +58,7 @@ public class QQLoginInstance extends LoginInstance {
                     listener.beforeFetchUserInfo(token);
                     fetchUserInfo(token);
                 } else {
-                    listener.loginSuccess(new LoginResult(token));
+                    listener.doLoginSuccess(new LoginResult(LoginPlatform.QQ, token));
                 }
             }
 
@@ -77,7 +77,7 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public void doLogin(Activity activity, final LoginListener listener, boolean fetchUserInfo) {
-        mTencent = Tencent.createInstance(ShareUtil.getQQId(), activity);
+        mTencent = Tencent.createInstance(ShareManager.QQ_ID, activity);
 
         mTencent.login(activity, SCOPE, mIUiListener);
     }
@@ -106,19 +106,25 @@ public class QQLoginInstance extends LoginInstance {
                 .subscribe(new Action1<QQUser>() {
                     @Override
                     public void call(QQUser qqUser) {
-                        mLoginListener.loginSuccess(new LoginResult(token, qqUser));
+                        mLoginListener.doLoginSuccess(
+                                new LoginResult(LoginPlatform.QQ, token, qqUser));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                        mLoginListener.doLoginFailure(new Exception(throwable));
                     }
                 });
     }
 
     private String buildUserInfoUrl(BaseToken token, String base) {
-        return base + "?access_token=" + token.getAccessToken() + "&oauth_consumer_key=" + ShareUtil
-                .getQQId() + "&openid=" + token.getOpenid();
+        return base
+                + "?access_token="
+                + token.getAccessToken()
+                + "&oauth_consumer_key="
+                + ShareManager.QQ_ID
+                + "&openid="
+                + token.getOpenid();
     }
 
     @Override
@@ -127,7 +133,10 @@ public class QQLoginInstance extends LoginInstance {
     }
 
     @Override
-    public void handleWxResult(SendAuth.Resp resp) {
-
+    public void recycle() {
+        mTencent.releaseResource();
+        mIUiListener = null;
+        mLoginListener = null;
+        mTencent = null;
     }
 }

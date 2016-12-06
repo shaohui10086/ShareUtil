@@ -1,1 +1,1 @@
-include ':example', ':shareutil', ':sicilly'
+include ':example', ':shareutil', ':sicilly', ':livestreaming'

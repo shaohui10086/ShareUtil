@@ -45,7 +45,6 @@ public class WeiboUser extends BaseUser {
      *         "created_at": "Tue May 24 18:04:53 +0800 2011",
      *         "id": 11142488790,
      *         "text": "我的相机到了。",
-     *         "source": "<a href="http://weibo.com" rel="nofollow">新浪微博</a>",
      *         "favorited": false,
      *         "truncated": false,
      *         "in_reply_to_status_id": "",

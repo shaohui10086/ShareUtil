@@ -10,9 +10,12 @@ import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
 import com.tencent.mm.sdk.modelmsg.SendAuth;
 import java.io.IOException;
+import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.login.LoginListener;
+import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
+import me.shaohui.shareutil.login.LoginUtil;
 import me.shaohui.shareutil.login.result.BaseToken;
 import me.shaohui.shareutil.login.result.WeiboToken;
 import me.shaohui.shareutil.login.result.WeiboUser;
@@ -46,14 +49,15 @@ public class WeiboLoginInstance extends LoginInstance {
     public WeiboLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         AuthInfo authInfo =
-                new AuthInfo(activity, ShareUtil.getWeiboId(), ShareUtil.getWeiboRedirectUrl(),
-                        ShareUtil.getWeiboScope());
+                new AuthInfo(activity, ShareManager.WEIBO_ID, ShareManager.WEIBO_REDIRECT_URL,
+                        ShareManager.WEIBO_SCOPE);
         mSsoHandler = new SsoHandler(activity, authInfo);
         mLoginListener = listener;
     }
 
     @Override
-    public void doLogin(Activity activity, final LoginListener listener, final boolean fetchUserInfo) {
+    public void doLogin(Activity activity, final LoginListener listener,
+            final boolean fetchUserInfo) {
         mSsoHandler.authorize(new WeiboAuthListener() {
             @Override
             public void onComplete(Bundle bundle) {
@@ -63,7 +67,7 @@ public class WeiboLoginInstance extends LoginInstance {
                     listener.beforeFetchUserInfo(weiboToken);
                     fetchUserInfo(weiboToken);
                 } else {
-                    listener.loginSuccess(new LoginResult(weiboToken));
+                    listener.doLoginSuccess(new LoginResult(LoginPlatform.WEIBO, weiboToken));
                 }
             }
 
@@ -85,7 +89,8 @@ public class WeiboLoginInstance extends LoginInstance {
             @Override
             public void call(Emitter<WeiboUser> weiboUserEmitter) {
                 OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder().url(buildUserInfoUrl(token, USER_INFO)).build();
+                Request request =
+                        new Request.Builder().url(buildUserInfoUrl(token, USER_INFO)).build();
                 try {
                     Response response = client.newCall(request).execute();
                     JSONObject jsonObject = new JSONObject(response.body().string());
@@ -102,12 +107,14 @@ public class WeiboLoginInstance extends LoginInstance {
                 .subscribe(new Action1<WeiboUser>() {
                     @Override
                     public void call(WeiboUser weiboUser) {
-                        mLoginListener.loginSuccess(new LoginResult(token, weiboUser));
+                        mLoginListener.doLoginSuccess(
+                                new LoginResult(LoginPlatform.WEIBO, token, weiboUser));
+                        LoginUtil.recycle();
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                        mLoginListener.doLoginFailure(new Exception(throwable));
                     }
                 });
     }
@@ -122,6 +129,8 @@ public class WeiboLoginInstance extends LoginInstance {
     }
 
     @Override
-    public void handleWxResult(SendAuth.Resp resp) {
+    public void recycle() {
+        mSsoHandler = null;
+        mLoginListener = null;
     }
 }

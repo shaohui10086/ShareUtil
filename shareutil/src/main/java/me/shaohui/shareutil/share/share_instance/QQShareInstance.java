@@ -16,6 +16,7 @@ import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
@@ -36,7 +37,7 @@ public class QQShareInstance implements ShareInstance {
         if (platform == SharePlatform.QZONE) {
             shareToQZoneForText(text, activity, listener);
         } else {
-            //TODO
+            listener.shareFailure(new Exception("qq not support share text"));
         }
     }
 
@@ -64,6 +65,15 @@ public class QQShareInstance implements ShareInstance {
                         listener.shareRequest();
                     }
                 })
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        if (mTencent != null) {
+                            mTencent.releaseResource();
+                            mTencent = null;
+                        }
+                    }
+                })
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
@@ -75,14 +85,13 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForMedia(title, targetUrl, summary, s, activity, listener);
                             }
                         } else {
-                            listener.shareFailure();
+                            listener.shareFailure(new Exception("image fetch error"));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        listener.shareFailure();
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -110,6 +119,15 @@ public class QQShareInstance implements ShareInstance {
                         listener.shareRequest();
                     }
                 })
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        if (mTencent != null) {
+                            mTencent.releaseResource();
+                            mTencent = null;
+                        }
+                    }
+                })
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String localPath) {
@@ -120,14 +138,13 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForImage(localPath, activity, listener);
                             }
                         } else {
-                            listener.shareFailure();
+                            listener.shareFailure(new Exception("image fetch error"));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        throwable.printStackTrace();
-                        listener.shareFailure();
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }

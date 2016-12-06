@@ -23,6 +23,5 @@ public abstract class LoginInstance {
 
     public abstract void handleResult(int requestCode, int resultCode, Intent data);
 
-    public abstract void handleWxResult(SendAuth.Resp resp);
-
+    public abstract void recycle();
 }

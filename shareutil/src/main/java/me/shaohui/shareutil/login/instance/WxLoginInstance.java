@@ -2,13 +2,17 @@ package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
 import android.content.Intent;
+import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelmsg.SendAuth;
 import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import java.io.IOException;
+import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.login.LoginListener;
+import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
 import me.shaohui.shareutil.login.result.BaseToken;
 import me.shaohui.shareutil.login.result.WxToken;
@@ -46,7 +50,7 @@ public class WxLoginInstance extends LoginInstance {
     public WxLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
-        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareUtil.WX_ID);
+        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.WX_ID);
         mClient = new OkHttpClient();
         this.fetchUserInfo = fetchUserInfo;
     }
@@ -80,41 +84,50 @@ public class WxLoginInstance extends LoginInstance {
                 .subscribe(new Action1<WxUser>() {
                     @Override
                     public void call(WxUser wxUser) {
-                        mLoginListener.loginSuccess(new LoginResult(token, wxUser));
+                        mLoginListener.doLoginSuccess(
+                                new LoginResult(LoginPlatform.WX, token, wxUser));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                        mLoginListener.doLoginFailure(new Exception(throwable));
                     }
                 });
     }
 
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
-    }
+        mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
+            @Override
+            public void onReq(BaseReq baseReq) {
+            }
 
-    @Override
-    public void handleWxResult(SendAuth.Resp resp) {
-        switch (resp.errCode) {
-            case BaseResp.ErrCode.ERR_OK:
-                getToken(resp.code);
-                break;
-            case BaseResp.ErrCode.ERR_USER_CANCEL:
-                mLoginListener.loginCancel();
-                break;
-            case BaseResp.ErrCode.ERR_SENT_FAILED:
-                mLoginListener.loginFailure(new Exception("wx_err_sent_failed"));
-                break;
-            case BaseResp.ErrCode.ERR_UNSUPPORT:
-                mLoginListener.loginFailure(new Exception("wx_err_unsupport"));
-                break;
-            case BaseResp.ErrCode.ERR_AUTH_DENIED:
-                mLoginListener.loginFailure(new Exception("wx_auth_denied"));
-                break;
-            default:
-                mLoginListener.loginFailure(new Exception("wx_login_error"));
-        }
+            @Override
+            public void onResp(BaseResp baseResp) {
+                if (baseResp instanceof SendAuth.Resp && baseResp.getType() == 1) {
+                    SendAuth.Resp resp = (SendAuth.Resp) baseResp;
+                    switch (resp.errCode) {
+                        case BaseResp.ErrCode.ERR_OK:
+                            getToken(resp.code);
+                            break;
+                        case BaseResp.ErrCode.ERR_USER_CANCEL:
+                            mLoginListener.doLoginCancel();
+                            break;
+                        case BaseResp.ErrCode.ERR_SENT_FAILED:
+                            mLoginListener.doLoginFailure(new Exception("wx_err_sent_failed"));
+                            break;
+                        case BaseResp.ErrCode.ERR_UNSUPPORT:
+                            mLoginListener.doLoginFailure(new Exception("wx_err_unsupport"));
+                            break;
+                        case BaseResp.ErrCode.ERR_AUTH_DENIED:
+                            mLoginListener.doLoginFailure(new Exception("wx_auth_denied"));
+                            break;
+                        default:
+                            mLoginListener.doLoginFailure(new Exception("wx_login_error"));
+                    }
+                }
+            }
+        });
     }
 
     private void getToken(final String code) {
@@ -141,23 +154,30 @@ public class WxLoginInstance extends LoginInstance {
                             mLoginListener.beforeFetchUserInfo(wxToken);
                             fetchUserInfo(wxToken);
                         } else {
-                            mLoginListener.loginSuccess(new LoginResult(wxToken));
+                            mLoginListener.doLoginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.loginFailure(new Exception(throwable.getMessage()));
+                        mLoginListener.doLoginFailure(new Exception(throwable.getMessage()));
                     }
                 });
+    }
+
+    @Override
+    public void recycle() {
+        if (mIWXAPI != null) {
+            mIWXAPI.detach();
+        }
     }
 
     private String buildTokenUrl(String code) {
         return BASE_URL
                 + "oauth2/access_token?appid="
-                + ShareUtil.getWxId()
+                + ShareManager.WX_ID
                 + "&secret="
-                + ShareUtil.getWxSecret()
+                + ShareManager.WX_SECRET
                 + "&code="
                 + code
                 + "&grant_type=authorization_code";

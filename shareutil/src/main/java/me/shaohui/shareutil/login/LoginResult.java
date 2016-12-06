@@ -13,13 +13,25 @@ public class LoginResult {
 
     private BaseUser mUserInfo;
 
-    public LoginResult(BaseToken token) {
+    private int mPlatform;
+
+    public LoginResult(int platform, BaseToken token) {
+        mPlatform = platform;
         mToken = token;
     }
 
-    public LoginResult(BaseToken token, BaseUser userInfo) {
+    public LoginResult(int platform, BaseToken token, BaseUser userInfo) {
+        mPlatform = platform;
         mToken = token;
         mUserInfo = userInfo;
+    }
+
+    public int getPlatform() {
+        return mPlatform;
+    }
+
+    public void setPlatform(int platform) {
+        this.mPlatform = platform;
     }
 
     public BaseToken getToken() {
