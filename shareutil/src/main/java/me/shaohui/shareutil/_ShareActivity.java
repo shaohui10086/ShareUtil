@@ -20,6 +20,7 @@ public class _ShareActivity extends Activity {
     public static Intent newInstance(Context context, int type) {
         Intent intent = new Intent(context, _ShareActivity.class);
         intent.putExtra(TYPE, type);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 

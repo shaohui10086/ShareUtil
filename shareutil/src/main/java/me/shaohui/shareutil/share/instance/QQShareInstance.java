@@ -84,7 +84,7 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQZoneForMedia(title, targetUrl, summary, s, activity,
                                         listener);
                             } else {
-                                shareToQQForMedia(title, targetUrl, summary, s, activity, listener);
+                                shareToQQForMedia(title, summary, targetUrl, s, activity, listener);
                             }
                         } else {
                             startFailed(activity, listener, new Exception("image fetch error"));

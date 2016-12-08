@@ -20,7 +20,7 @@ public abstract class ShareListener implements IUiListener, IWeiboHandler.Respon
 
     @Override
     public void onError(UiError uiError) {
-        doShareFailure(new Exception(uiError.errorDetail));
+        doShareFailure(new Exception(uiError == null ? "QQ share failed" : uiError.errorDetail));
     }
 
     @Override
