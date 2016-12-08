@@ -43,7 +43,8 @@ public class QQLoginInstance extends LoginInstance {
     public QQLoginInstance(Activity activity, final LoginListener listener,
             final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        mTencent = Tencent.createInstance(ShareManager.QQ_ID, activity.getApplicationContext());
+        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(),
+                activity.getApplicationContext());
         mLoginListener = listener;
         mIUiListener = new IUiListener() {
             @Override
@@ -77,7 +78,7 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public void doLogin(Activity activity, final LoginListener listener, boolean fetchUserInfo) {
-        mTencent = Tencent.createInstance(ShareManager.QQ_ID, activity);
+        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity);
 
         mTencent.login(activity, SCOPE, mIUiListener);
     }
@@ -122,7 +123,7 @@ public class QQLoginInstance extends LoginInstance {
                 + "?access_token="
                 + token.getAccessToken()
                 + "&oauth_consumer_key="
-                + ShareManager.QQ_ID
+                + ShareManager.CONFIG.getQqId()
                 + "&openid="
                 + token.getOpenid();
     }

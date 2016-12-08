@@ -10,24 +10,17 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
-import com.tencent.mm.sdk.modelbase.BaseReq;
-import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.openapi.IWXAPI;
-import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
-import com.tencent.tauth.Tencent;
-import java.lang.ref.WeakReference;
 import java.util.List;
-import me.shaohui.shareutil.login.LoginListener;
-import me.shaohui.shareutil.login.instance.WeiboLoginInstance;
 import me.shaohui.shareutil.share.ShareImageObject;
-import me.shaohui.shareutil.share.share_instance.ShareInstance;
 import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
-import me.shaohui.shareutil.share.share_instance.DefaultShareInstance;
-import me.shaohui.shareutil.share.share_instance.QQShareInstance;
-import me.shaohui.shareutil.share.share_instance.WeiboShareInstance;
-import me.shaohui.shareutil.share.share_instance.WxShareInstance;
+import me.shaohui.shareutil.share.instance.DefaultShareInstance;
+import me.shaohui.shareutil.share.instance.QQShareInstance;
+import me.shaohui.shareutil.share.instance.ShareInstance;
+import me.shaohui.shareutil.share.instance.WeiboShareInstance;
+import me.shaohui.shareutil.share.instance.WxShareInstance;
 
 /**
  * Created by shaohui on 2016/11/18.
@@ -42,101 +35,136 @@ public class ShareUtil {
      * 3. 文字长度限制
      */
 
-    private WeakReference<Activity> mActivityWeakReference;
+    public static final int TYPE = 798;
 
     public static ShareListener mShareListener;
 
-    /**
-     * VistaShareUtil 初始化
-     */
+    private static ShareInstance mShareInstance;
 
-    public static void setShareListener(ShareListener listener) {
+    final static int TYPE_IMAGE = 1;
+    final static int TYPE_TEXT = 2;
+    final static int TYPE_MEDIA = 3;
+
+    private static int mType;
+    private static int mPlatform;
+    private static String mText;
+    private static ShareImageObject mShareImageObject;
+    private static String mTitle;
+    private static String mSummary;
+    private static String mTargetUrl;
+
+    static void action(Activity activity) {
+        mShareInstance = getShareInstance(mPlatform, activity);
+        switch (mType) {
+            case TYPE_TEXT:
+                mShareInstance.shareText(mPlatform, mText, activity, mShareListener);
+                break;
+            case TYPE_IMAGE:
+                mShareInstance.shareImage(mPlatform, mShareImageObject, activity, mShareListener);
+                break;
+            case TYPE_MEDIA:
+                mShareInstance.shareMedia(mPlatform, mTitle, mTargetUrl, mSummary,
+                        mShareImageObject, activity, mShareListener);
+                break;
+        }
+
+        // 默认系统分享没有回调，所以需要手动处理掉分享的activity
+        if (mPlatform == SharePlatform.DEFAULT) {
+            activity.finish();
+        }
+    }
+
+    public static void shareText(Context context, @SharePlatform.Platform int platform, String text,
+            ShareListener listener) {
+        mType = TYPE_TEXT;
+        mText = text;
+        mPlatform = platform;
         mShareListener = listener;
+
+        context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
-    public static ShareListener getShareListener() {
-        return mShareListener;
+    public static void shareImage(Context context, @SharePlatform.Platform final int platform,
+            final String urlOrPath, ShareListener listener) {
+        mType = TYPE_IMAGE;
+        mPlatform = platform;
+        mShareImageObject = new ShareImageObject(urlOrPath);
+        mShareListener = listener;
+
+        context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
-    private ShareUtil(Activity activity) {
-        mActivityWeakReference = new WeakReference<>(activity);
+    public static void shareImage(Context context, @SharePlatform.Platform final int platform,
+            final Bitmap bitmap, ShareListener listener) {
+        mType = TYPE_IMAGE;
+        mPlatform = platform;
+        mShareImageObject = new ShareImageObject(bitmap);
+        mShareListener = listener;
+
+        context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
-    public static ShareUtil newInstance(Activity activity) {
-        return new ShareUtil(activity);
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform,
+            String title, String summary, String targetUrl, Bitmap thumb, ShareListener listener) {
+        mType = TYPE_MEDIA;
+        mPlatform = platform;
+        mShareImageObject = new ShareImageObject(thumb);
+        mSummary = summary;
+        mTargetUrl = targetUrl;
+        mTitle = title;
+        mShareListener = listener;
+
+        context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
-    public void shareText(@SharePlatform.Platform int platform, String text) {
-        if (mActivityWeakReference.get() == null) {
-            return;
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform,
+            String title, String summary, String targetUrl, String thumbUrlOrPath,
+            ShareListener listener) {
+        mType = TYPE_MEDIA;
+        mPlatform = platform;
+        mShareImageObject = new ShareImageObject(thumbUrlOrPath);
+        mSummary = summary;
+        mTargetUrl = targetUrl;
+        mTitle = title;
+        mShareListener = listener;
+
+        context.startActivity(_ShareActivity.newInstance(context, TYPE));
+    }
+
+    public static void handleResult(Intent data) {
+        // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
+        if (mShareInstance != null && data != null) {
+            mShareInstance.handleResult(data);
         }
-
-        ShareInstance instance = getShareInstance(platform, mActivityWeakReference.get());
-        instance.shareText(platform, text, mActivityWeakReference.get(), mShareListener);
     }
 
-    public void shareImage(@SharePlatform.Platform final int platform, final String urlOrPath) {
-        if (mActivityWeakReference.get() == null) {
-            return;
-        }
-
-        ShareInstance instance = getShareInstance(platform, mActivityWeakReference.get());
-
-        ShareImageObject imageObject = new ShareImageObject(urlOrPath);
-        instance.shareImage(platform, imageObject, mActivityWeakReference.get(), mShareListener);
-    }
-
-    public void shareImage(@SharePlatform.Platform final int platform, final Bitmap bitmap) {
-        if (mActivityWeakReference.get() == null) {
-            return;
-        }
-
-        ShareInstance instance = getShareInstance(platform, mActivityWeakReference.get());
-
-        ShareImageObject imageObject = new ShareImageObject(bitmap);
-        instance.shareImage(platform, imageObject, mActivityWeakReference.get(), mShareListener);
-    }
-
-    public void shareMedia(@SharePlatform.Platform int platform, String title, String summary,
-            String targetUrl, Bitmap thumb) {
-        ShareInstance instance = getShareInstance(platform, mActivityWeakReference.get());
-        ShareImageObject imageObject = new ShareImageObject(thumb);
-        instance.shareMedia(platform, title, targetUrl, summary, imageObject,
-                mActivityWeakReference.get(), mShareListener);
-    }
-
-    public void shareMedia(@SharePlatform.Platform int platform, String title, String summary,
-            String targetUrl, String thumbUrlOrPath) {
-        ShareInstance instance = getShareInstance(platform, mActivityWeakReference.get());
-        ShareImageObject imageObject = new ShareImageObject(thumbUrlOrPath);
-        instance.shareMedia(platform, title, targetUrl, summary, imageObject,
-                mActivityWeakReference.get(), mShareListener);
-    }
-
-    public static void handleWeiboResponse(Context context, Intent intent) {
-        IWeiboShareAPI mWeiboShareAPI = WeiboShareSDK.createWeiboAPI(context, ShareManager.WEIBO_ID);
-        mWeiboShareAPI.registerApp();
-        mWeiboShareAPI.handleWeiboResponse(intent, mShareListener);
-    }
-
-    public static void handleQQResult(Intent data) {
-        Tencent.handleResultData(data, mShareListener);
-    }
-
-    private ShareInstance getShareInstance(@SharePlatform.Platform int platform, Context context) {
+    private static ShareInstance getShareInstance(@SharePlatform.Platform int platform,
+            Context context) {
         switch (platform) {
             case SharePlatform.WX:
             case SharePlatform.WX_TIMELINE:
-                return new WxShareInstance(context, ShareManager.WX_ID);
+                return new WxShareInstance(context, ShareManager.CONFIG.getWxId());
             case SharePlatform.QQ:
             case SharePlatform.QZONE:
-                return new QQShareInstance(context, ShareManager.QQ_ID);
+                return new QQShareInstance(context, ShareManager.CONFIG.getQqId());
             case SharePlatform.WEIBO:
-                return new WeiboShareInstance(context, ShareManager.WEIBO_ID);
+                return new WeiboShareInstance(context, ShareManager.CONFIG.getWeiboId());
             case SharePlatform.DEFAULT:
             default:
                 return new DefaultShareInstance();
         }
+    }
+
+    public static void recycle() {
+        mShareImageObject = null;
+        mTitle = null;
+        mSummary = null;
+        mShareListener = null;
+
+        if (mShareInstance != null) {
+            mShareInstance.recycle();
+        }
+        mShareInstance = null;
     }
 
     /**
@@ -159,12 +187,13 @@ public class ShareUtil {
     }
 
     public static boolean isWeiBoInstalled(@NonNull Context context) {
-        IWeiboShareAPI shareAPI = WeiboShareSDK.createWeiboAPI(context, ShareManager.WEIBO_ID);
+        IWeiboShareAPI shareAPI =
+                WeiboShareSDK.createWeiboAPI(context, ShareManager.CONFIG.getWeiboId());
         return shareAPI.isWeiboAppInstalled();
     }
 
     public static boolean isWeiXinInstalled(Context context) {
-        IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.WX_ID, true);
+        IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
     }
 }

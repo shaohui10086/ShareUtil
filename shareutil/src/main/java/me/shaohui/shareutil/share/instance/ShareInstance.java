@@ -1,6 +1,7 @@
-package me.shaohui.shareutil.share.share_instance;
+package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
+import android.content.Intent;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
 
@@ -17,4 +18,8 @@ public interface ShareInstance {
 
     void shareImage(int platform, ShareImageObject shareImageObject, Activity activity,
             ShareListener listener);
+
+    void handleResult(Intent data);
+
+    void recycle();
 }

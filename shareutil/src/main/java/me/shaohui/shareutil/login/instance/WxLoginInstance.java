@@ -10,7 +10,6 @@ import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import java.io.IOException;
 import me.shaohui.shareutil.ShareManager;
-import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
@@ -50,7 +49,7 @@ public class WxLoginInstance extends LoginInstance {
     public WxLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
-        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.WX_ID);
+        mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
         mClient = new OkHttpClient();
         this.fetchUserInfo = fetchUserInfo;
     }
@@ -175,9 +174,9 @@ public class WxLoginInstance extends LoginInstance {
     private String buildTokenUrl(String code) {
         return BASE_URL
                 + "oauth2/access_token?appid="
-                + ShareManager.WX_ID
+                + ShareManager.CONFIG.getWxId()
                 + "&secret="
-                + ShareManager.WX_SECRET
+                + ShareManager.CONFIG.getWxSecret()
                 + "&code="
                 + code
                 + "&grant_type=authorization_code";

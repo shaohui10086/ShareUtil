@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.login;
 
+import me.shaohui.shareutil.LoginUtil;
 import me.shaohui.shareutil.login.result.BaseToken;
 
 /**

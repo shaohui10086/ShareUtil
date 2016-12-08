@@ -1,10 +1,12 @@
 package me.shaohui.shareutil.share;
 
+import android.util.Log;
 import com.sina.weibo.sdk.api.share.BaseResponse;
 import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.UiError;
+import me.shaohui.shareutil.ShareUtil;
 
 /**
  * Created by shaohui on 2016/11/18.
@@ -13,32 +15,49 @@ import com.tencent.tauth.UiError;
 public abstract class ShareListener implements IUiListener, IWeiboHandler.Response {
     @Override
     public void onComplete(Object o) {
-        shareSuccess();
+        doShareSuccess();
     }
 
     @Override
     public void onError(UiError uiError) {
-        shareFailure(new Exception(uiError.errorDetail));
+        doShareFailure(new Exception(uiError.errorDetail));
     }
 
     @Override
     public void onCancel() {
-        shareCancel();
+        doShareCancel();
     }
 
     @Override
     public void onResponse(BaseResponse baseResponse) {
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
-                shareSuccess();
+                doShareSuccess();
                 break;
             case WBConstants.ErrorCode.ERR_FAIL:
-                shareFailure(new Exception(baseResponse.errMsg));
+                doShareFailure(new Exception(baseResponse.errMsg));
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
-                shareCancel();
+                doShareCancel();
                 break;
+            default:
+                doShareFailure(new Exception(baseResponse.errMsg));
         }
+    }
+
+    public void doShareSuccess() {
+        ShareUtil.recycle();
+        shareSuccess();
+    }
+
+    public void doShareFailure(Exception e) {
+        ShareUtil.recycle();
+        shareFailure(e);
+    }
+
+    public void doShareCancel() {
+        ShareUtil.recycle();
+        shareCancel();
     }
 
     public abstract void shareSuccess();

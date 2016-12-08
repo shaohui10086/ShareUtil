@@ -1,18 +1,24 @@
-package me.shaohui.shareutil.share.share_instance;
+package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
+import com.tencent.mm.sdk.modelbase.BaseReq;
+import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelmsg.SendMessageToWX;
 import com.tencent.mm.sdk.modelmsg.WXImageObject;
 import com.tencent.mm.sdk.modelmsg.WXMediaMessage;
 import com.tencent.mm.sdk.modelmsg.WXTextObject;
 import com.tencent.mm.sdk.modelmsg.WXWebpageObject;
 import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.IWXAPIEventHandler;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
+import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
@@ -105,7 +111,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        startFailed(activity, listener, new Exception(throwable));
                     }
                 });
     }
@@ -157,9 +163,42 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        startFailed(activity, listener, new Exception(throwable));
                     }
                 });
+    }
+
+    @Override
+    public void handleResult(Intent data) {
+        mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
+            @Override
+            public void onReq(BaseReq baseReq) {
+            }
+
+            @Override
+            public void onResp(BaseResp baseResp) {
+                switch (baseResp.errCode) {
+                    case BaseResp.ErrCode.ERR_OK:
+                        ShareUtil.mShareListener.doShareSuccess();
+                        break;
+                    case BaseResp.ErrCode.ERR_USER_CANCEL:
+                        ShareUtil.mShareListener.doShareCancel();
+                        break;
+                    default:
+                        ShareUtil.mShareListener.doShareFailure(new Exception(baseResp.errStr));
+                }
+            }
+        });
+    }
+
+    private void startFailed(Activity activity, ShareListener listener, Exception e) {
+        activity.finish();
+        listener.doShareFailure(e);
+    }
+
+    @Override
+    public void recycle() {
+        mIWXAPI.detach();
     }
 
     private void sendMessage(int platform, WXMediaMessage message, String transaction) {
@@ -169,7 +208,6 @@ public class WxShareInstance implements ShareInstance {
         req.scene = platform == SharePlatform.WX_TIMELINE ? SendMessageToWX.Req.WXSceneTimeline
                 : SendMessageToWX.Req.WXSceneSession;
         mIWXAPI.sendReq(req);
-        mIWXAPI.detach();
     }
 
     private String buildTransaction(String type) {

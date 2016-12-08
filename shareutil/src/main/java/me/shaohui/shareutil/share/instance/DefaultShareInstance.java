@@ -1,4 +1,4 @@
-package me.shaohui.shareutil.share.share_instance;
+package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -82,8 +82,18 @@ public class DefaultShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        listener.doShareFailure(new Exception(throwable));
                     }
                 });
+    }
+
+    @Override
+    public void handleResult(Intent data) {
+
+    }
+
+    @Override
+    public void recycle() {
+
     }
 }

@@ -1,7 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-
         package="me.shaohui.shareutil"
         >
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
 
     <application
             android:allowBackup="true"
@@ -15,6 +18,7 @@
                 android:windowSoftInputMode="adjustResize"
                 >
         </activity>
+
         <activity
                 android:name="com.tencent.connect.common.AssistActivity"
                 android:configChanges="orientation|keyboardHidden"
@@ -22,6 +26,32 @@
                 android:theme="@android:style/Theme.Translucent.NoTitleBar"
                 >
         </activity>
+
+        <activity
+                android:name="com.tencent.tauth.AuthActivity"
+                android:noHistory="true"
+                android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="tencent${qq_id}" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="me.shaohui.shareutil._ShareActivity"
+                android:launchMode="singleTask"
+                android:taskAffinity="me.shaohui.shareutil"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity-alias
+                android:name="${applicationId}.wxapi.WXEntryActivity"
+                android:exported="true"
+                android:targetActivity="me.shaohui.shareutil._ShareActivity"/>
     </application>
 
 </manifest>

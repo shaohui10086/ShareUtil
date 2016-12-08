@@ -8,14 +8,12 @@ import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
-import com.tencent.mm.sdk.modelmsg.SendAuth;
 import java.io.IOException;
+import me.shaohui.shareutil.LoginUtil;
 import me.shaohui.shareutil.ShareManager;
-import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
-import me.shaohui.shareutil.login.LoginUtil;
 import me.shaohui.shareutil.login.result.BaseToken;
 import me.shaohui.shareutil.login.result.WeiboToken;
 import me.shaohui.shareutil.login.result.WeiboUser;
@@ -48,9 +46,8 @@ public class WeiboLoginInstance extends LoginInstance {
 
     public WeiboLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        AuthInfo authInfo =
-                new AuthInfo(activity, ShareManager.WEIBO_ID, ShareManager.WEIBO_REDIRECT_URL,
-                        ShareManager.WEIBO_SCOPE);
+        AuthInfo authInfo = new AuthInfo(activity, ShareManager.CONFIG.getWeiboId(),
+                ShareManager.CONFIG.getWeiboRedirectUrl(), ShareManager.CONFIG.getWeiboScope());
         mSsoHandler = new SsoHandler(activity, authInfo);
         mLoginListener = listener;
     }

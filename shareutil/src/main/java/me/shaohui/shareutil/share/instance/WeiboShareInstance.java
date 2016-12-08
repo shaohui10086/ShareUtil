@@ -1,7 +1,8 @@
-package me.shaohui.shareutil.share.share_instance;
+package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.util.Pair;
@@ -9,8 +10,11 @@ import com.sina.weibo.sdk.api.ImageObject;
 import com.sina.weibo.sdk.api.TextObject;
 import com.sina.weibo.sdk.api.WeiboMultiMessage;
 import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
+import com.sina.weibo.sdk.api.share.SendMessageToWeiboResponse;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
+import com.sina.weibo.sdk.constant.WBConstants;
+import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
@@ -61,6 +65,31 @@ public class WeiboShareInstance implements ShareInstance {
     public void shareImage(int platform, ShareImageObject shareImageObject, Activity activity,
             ShareListener listener) {
         shareTextOrImage(shareImageObject, null, activity, listener);
+    }
+
+    @Override
+    public void handleResult(Intent intent) {
+        SendMessageToWeiboResponse baseResponse =
+                new SendMessageToWeiboResponse(intent.getExtras());
+
+        switch (baseResponse.errCode) {
+            case WBConstants.ErrorCode.ERR_OK:
+                ShareUtil.mShareListener.doShareSuccess();
+                break;
+            case WBConstants.ErrorCode.ERR_FAIL:
+                ShareUtil.mShareListener.doShareFailure(new Exception(baseResponse.errMsg));
+                break;
+            case WBConstants.ErrorCode.ERR_CANCEL:
+                ShareUtil.mShareListener.doShareCancel();
+                break;
+            default:
+                ShareUtil.mShareListener.doShareFailure(new Exception(baseResponse.errMsg));
+        }
+    }
+
+    @Override
+    public void recycle() {
+        mWeiboShareAPI = null;
     }
 
     private void shareTextOrImage(final ShareImageObject shareImageObject, final String text,
@@ -121,7 +150,7 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        startFailed(activity, listener, new Exception(throwable));
                     }
                 });
     }
@@ -131,5 +160,10 @@ public class WeiboShareInstance implements ShareInstance {
         request.transaction = String.valueOf(System.currentTimeMillis());
         request.multiMessage = message;
         mWeiboShareAPI.sendRequest(activity, request);
+    }
+
+    private void startFailed(Activity activity, ShareListener listener, Exception e) {
+        activity.finish();
+        listener.doShareFailure(e);
     }
 }

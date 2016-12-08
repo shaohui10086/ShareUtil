@@ -21,91 +21,46 @@
 
 ## Usage
 
-1. 添加依赖
+#### 添加依赖
 
-        compile 'me.shaohui:shareutil:1.2.5'
+        compile 'me.shaohui:shareutil:1.3.0'
 
+#### 使用配置
+
+1. build.gradle 配置
+在defaultConfig节点下增加你的qq id信息
+
+        defaultConfig {
+        
+            manifestPlaceholders = [
+                    qq_id: "123456789"
+            ]
+            
+        }
 2. 在使用之前设置wxId，sinaId，qqId，以及分享的回调（推荐放在Application的onCreate方法中）
     
-            // 分享和登录都需要设置
-            ShareManager.WX_ID = "wx_XXXXXX";
-            ShareManager.WEIBO_ID = "123XXXXX";
-            ShareManager.QQ_ID = "123XXX";
-            ShareManager.WX_SECRET = "XXXXXXX";     // 微信登录所需，如果只分享，不需要设置
-                       
-            // 分享设置
-            ShareUtil.setShareListener(new ShareListener());
-            
-3. AndroidManifest配置
+            // init
+            ShareConfig config = ShareConfig.instance()
+                    .qqId(QQ_ID)
+                    .wxId(WX_ID)
+                    .weiboId(WEIBO_ID)
+                    .wxSecret(WX_ID);
+            ShareManager.init(config);
 
-            <uses-permission android:name="android.permission.INTERNET"/>
-            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-            <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-
-            <activity
-                    android:name="com.tencent.tauth.AuthActivity"
-                    android:noHistory="true"
-                    android:launchMode="singleTask">
-                <intent-filter>
-                    <action android:name="android.intent.action.VIEW" />
-                    <category android:name="android.intent.category.DEFAULT" />
-                    <category android:name="android.intent.category.BROWSABLE" />
-                    <!--注意要将这个改成你的QQ_ID-->
-                    <data android:scheme="tencent123456789" />
-                </intent-filter>
-            </activity>
-    
-            <!-- 接收微信的回调 -->
-            <activity android:name="me.shaohui.shareutil.WXEntryParent"/>
-            <activity-alias
-                    android:name=".wxapi.WXEntryActivity"
-                    android:exported="true"
-                    android:targetActivity="me.shaohui.shareutil.WXEntryParent"/>
-                    
-4. 必要的回调处理
-    1. 分享操作所在的Activity中添加微博和QQ的回调处理，建议放到BaseActivity中
-    
-            @Override
-            protected void onNewIntent(Intent intent) {
-                super.onNewIntent(intent);
-                ShareUtil.handleWeiboResponse(this, intent);   // 用于处理微博分享的回调
-            }
-        
-            @Override
-            protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-                super.onActivityResult(requestCode, resultCode, data);
-                ShareUtil.handleQQResult(data);    // 用于处理QQ分享的回调
-            }
-    
-     2. 登录的回调：
             
-            @Override
-            protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-                LoginUtil.handleResult(requestCode, resultCode, data);      // 注意不要和分享的回调重复
-            }
-           
-5. 分享
+                              
+3. 分享
     
-            ShareUtil shareUtil = ShareUtil.newInstnce(this);
+            ShareUtil.shareImage(this, SharePlatform.QQ, "http://image.com", shareListener);
+            ShareUtil.shareText(this, SharePlatform.WX, "分享文字", shareListener);
+            ShareUtil.shareMedia(this, SharePlatform.QZONE, "标题", "简介", "目标Url", "缩略图", shareListener);
             
-            shareUtil.shareText(SharePlatform.WX, "分享文字");
-            
-            // 三种图片分享方式
-            shareUtil.shareImage(SharePlatform.QQ, "分享图片链接");
-            shareUtil.shareImage(SharePlatform.QQ, "分享图片本地路径");
-            shareUtil.shareImage(SharePlatform.QQ, bitmap);
-            
-            shareUtil.shareMedia(SharePlatform.QZONE, "分享title", "分享简洁", "分享的链接", "分享缩略图链接");
 
 6. 登录
 
             // LoginPlatform.WEIBO  微博登录   
             // LoginPlatform.WX     微信登录
-            // LoginPlatform.QQ     QQ登录
-            
-            
-            LoginUtil.login(MainActivity.this, LoginPlatform.WEIBO, mLoginListener, isFetchUserInfo);
-            
+            // LoginPlatform.QQ     QQ登录 
             final LoginListener listener = new LoginListener() {
                     @Override
                     public void loginSuccess(LoginResult result) {
@@ -127,6 +82,7 @@
                         Log.i("TAG", "登录取消");
                     }
                 };
+            LoginUtil.login(MainActivity.this, LoginPlatform.WEIBO, mLoginListener, isFetchUserInfo);
             
 ### 分享使用
 
@@ -144,21 +100,24 @@
         微信版本：3.1.1
         QQ版本：3.1.0 lite版
         微博版本: 3.1.2
-
+3. 分享的bitmap，会在分享之后被回收掉，所以分享之后最好不要再对该bitmap做任何操作。
 ## ChangeLog
-
-1.2.8  增加分享失败Exception
-1.2.7  解决内存泄露的问题
+- 1.3.1  修复微博分享的bug
+- 1.3.0  重构使用方式，minSdkVersion - > 9
+- 1.2.8  增加分享失败Exception
+- 1.2.7  解决内存泄露的问题
 
 ## TODO
 
 1. 测试case 
 2. simple app
-3. 登录功能
-4. sharelistener 为空
 5. tencent 内存泄露
-6. 登录成功以后，logininstance置空
 7. 超类 LoginResult BaseToken，BaseUser
 8. 判断是否安装
+9. 链接 改成 uri
+10. 初始化方式太挫
+13. qq分享文字失败
+14. 是否在recycle 中 回收掉bitmap
+
 
 ## License

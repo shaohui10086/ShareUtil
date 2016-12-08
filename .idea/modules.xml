@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ShareUtil.iml" filepath="$PROJECT_DIR$/ShareUtil.iml" />
       <module fileurl="file://$PROJECT_DIR$/example/example.iml" filepath="$PROJECT_DIR$/example/example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/livestreaming/livestreaming.iml" filepath="$PROJECT_DIR$/livestreaming/livestreaming.iml" />
       <module fileurl="file://$PROJECT_DIR$/shareutil/shareutil.iml" filepath="$PROJECT_DIR$/shareutil/shareutil.iml" />
       <module fileurl="file://$PROJECT_DIR$/sicilly/sicilly.iml" filepath="$PROJECT_DIR$/sicilly/sicilly.iml" />
     </modules>

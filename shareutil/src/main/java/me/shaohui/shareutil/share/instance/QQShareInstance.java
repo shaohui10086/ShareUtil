@@ -1,7 +1,8 @@
-package me.shaohui.shareutil.share.share_instance;
+package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import com.tencent.connect.share.QQShare;
@@ -10,6 +11,7 @@ import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.Tencent;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
+import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
@@ -37,7 +39,7 @@ public class QQShareInstance implements ShareInstance {
         if (platform == SharePlatform.QZONE) {
             shareToQZoneForText(text, activity, listener);
         } else {
-            listener.shareFailure(new Exception("qq not support share text"));
+            startFailed(activity, listener, new Exception("qq not support share text"));
         }
     }
 
@@ -85,13 +87,13 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForMedia(title, targetUrl, summary, s, activity, listener);
                             }
                         } else {
-                            listener.shareFailure(new Exception("image fetch error"));
+                            startFailed(activity, listener, new Exception("image fetch error"));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        startFailed(activity, listener, new Exception(throwable));
                     }
                 });
     }
@@ -138,15 +140,30 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForImage(localPath, activity, listener);
                             }
                         } else {
-                            listener.shareFailure(new Exception("image fetch error"));
+                            startFailed(activity, listener, new Exception("image fetch error"));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.shareFailure(new Exception(throwable));
+                        startFailed(activity, listener, new Exception(throwable));
                     }
                 });
+    }
+
+    private void startFailed(Activity activity, ShareListener listener, Exception e) {
+        activity.finish();
+        listener.doShareFailure(e);
+    }
+
+    @Override
+    public void handleResult(Intent data) {
+        Tencent.handleResultData(data, ShareUtil.mShareListener);
+    }
+
+    @Override
+    public void recycle() {
+
     }
 
     private void shareToQQForMedia(String title, String summary, String targetUrl, String thumbUrl,
