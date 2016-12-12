@@ -14,7 +14,7 @@
 
 ## Usage
 
-#### 添加依赖
+### 添加依赖
 
 免第三方Jar包配置
 
@@ -24,7 +24,7 @@
 
 		compile 'me.shaohui:shareutil:1.3.4.no_jar'
 
-#### 使用配置
+### 使用配置
 
 1. build.gradle 配置
 在defaultConfig节点下增加你的qq id信息
@@ -33,11 +33,12 @@
         	...
         	
             manifestPlaceholders = [
+                    //  替换成你的qq_id
                     qq_id: "123456789"
             ]
             
         }
-2. 在使用之前设置wxId，sinaId，qqId，以及分享的回调（推荐放在Application的onCreate方法中）
+2. 在使用之前设置在各个平台申请的Id，以及分享的回调（推荐放在Application的onCreate方法中）
     
             // init
             ShareConfig config = ShareConfig.instance()
@@ -51,10 +52,9 @@
 
 ### 分享使用
 
- ShareUtil.shareImage(this, SharePlatform.QQ, "http://image.com", shareListener);
-            ShareUtil.shareText(this, SharePlatform.WX, "分享文字", shareListener);
-            ShareUtil.shareMedia(this, SharePlatform.QZONE, "title", "summary", "targetUrl", "thumb", shareListener);
-
+        ShareUtil.shareImage(this, SharePlatform.QQ, "http://image.com", shareListener);
+        ShareUtil.shareText(this, SharePlatform.WX, "分享文字", shareListener);
+        ShareUtil.shareMedia(this, SharePlatform.QZONE, "title", "summary", "targetUrl", "thumb", shareListener);
 
 
 ### 登录使用
@@ -103,6 +103,10 @@
 
 ## TODO
 
+
+## Thanks
+
+- https://github.com/tianzhijiexian/ShareLoginLib
 
 ## License
 
