@@ -1,6 +1,7 @@
 package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import com.tencent.mm.sdk.modelbase.BaseReq;
 import com.tencent.mm.sdk.modelbase.BaseResp;
@@ -127,6 +128,11 @@ public class WxLoginInstance extends LoginInstance {
                 }
             }
         });
+    }
+
+    @Override
+    public boolean isInstall(Context context) {
+        return mIWXAPI.isWXAppInstalled();
     }
 
     private void getToken(final String code) {

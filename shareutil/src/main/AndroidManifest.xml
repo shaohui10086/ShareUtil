@@ -40,7 +40,7 @@
         </activity>
 
         <activity android:name="me.shaohui.shareutil._ShareActivity"
-                android:launchMode="singleTask"
+                android:launchMode="singleTop"
                 android:taskAffinity="me.shaohui.shareutil"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>

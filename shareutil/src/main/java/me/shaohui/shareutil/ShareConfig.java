@@ -18,6 +18,8 @@ public class ShareConfig {
 
     private String weiboScope = "email";
 
+    private boolean debug;
+
     public static ShareConfig instance() {
         return new ShareConfig();
     }
@@ -52,6 +54,11 @@ public class ShareConfig {
         return this;
     }
 
+    public ShareConfig debug(boolean isDebug) {
+        debug = isDebug;
+        return this;
+    }
+
     public String getWxId() {
         return wxId;
     }
@@ -74,5 +81,9 @@ public class ShareConfig {
 
     public String getWeiboScope() {
         return weiboScope;
+    }
+
+    public boolean isDebug() {
+        return debug;
     }
 }

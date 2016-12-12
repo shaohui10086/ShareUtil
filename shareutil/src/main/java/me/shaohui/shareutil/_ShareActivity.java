@@ -15,18 +15,21 @@ public class _ShareActivity extends Activity {
 
     private int mType;
 
+    private boolean isNew;
+
     private static final String TYPE = "share_activity_type";
 
     public static Intent newInstance(Context context, int type) {
         Intent intent = new Intent(context, _ShareActivity.class);
         intent.putExtra(TYPE, type);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         return intent;
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ShareLog.i("ShareActivity onCreate");
+        isNew = true;
 
         // init data
         mType = getIntent().getIntExtra(TYPE, 0);
@@ -37,14 +40,28 @@ public class _ShareActivity extends Activity {
             // 登录
             LoginUtil.action(this);
         } else {
+            // handle 微信回调
+            LoginUtil.handleResult(-1, -1, getIntent());
+            ShareUtil.handleResult(getIntent());
             finish();
         }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ShareLog.i("ShareActivity onResume");
+        if (isNew) {
+            isNew = false;
+        } else {
+            finish();
+        }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        ShareLog.i("ShareActivity onNewIntent");
         // 处理回调
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(0, 0, intent);
@@ -57,6 +74,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        ShareLog.i("ShareActivity onActivityResult");
         // 处理回调
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(requestCode, resultCode, data);

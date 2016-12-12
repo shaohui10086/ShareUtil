@@ -1,8 +1,11 @@
 package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import com.sina.weibo.sdk.api.share.IWeiboShareAPI;
+import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WeiboAuthListener;
@@ -123,6 +126,13 @@ public class WeiboLoginInstance extends LoginInstance {
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
         mSsoHandler.authorizeCallBack(requestCode, resultCode, data);
+    }
+
+    @Override
+    public boolean isInstall(Context context) {
+        IWeiboShareAPI shareAPI =
+                WeiboShareSDK.createWeiboAPI(context, ShareManager.CONFIG.getWeiboId());
+        return shareAPI.isWeiboAppInstalled();
     }
 
     @Override

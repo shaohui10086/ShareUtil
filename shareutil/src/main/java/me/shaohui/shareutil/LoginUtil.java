@@ -1,6 +1,7 @@
 package me.shaohui.shareutil;
 
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import me.shaohui.shareutil.login.LoginListener;
@@ -36,6 +37,9 @@ public class LoginUtil {
         mPlatform = platform;
         mLoginListener = listener;
         isFetchUserInfo = fetchUserInfo;
+        if (context instanceof Application) {
+            listener.doLoginFailure(new Exception("don't support the application context"));
+        }
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 

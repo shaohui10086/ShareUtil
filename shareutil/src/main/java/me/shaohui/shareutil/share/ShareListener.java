@@ -6,6 +6,7 @@ import com.sina.weibo.sdk.api.share.IWeiboHandler;
 import com.sina.weibo.sdk.constant.WBConstants;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.UiError;
+import me.shaohui.shareutil.ShareLog;
 import me.shaohui.shareutil.ShareUtil;
 
 /**
@@ -46,16 +47,19 @@ public abstract class ShareListener implements IUiListener, IWeiboHandler.Respon
     }
 
     public void doShareSuccess() {
+        ShareLog.i("share success");
         ShareUtil.recycle();
         shareSuccess();
     }
 
     public void doShareFailure(Exception e) {
+        ShareLog.e("share failed");
         ShareUtil.recycle();
         shareFailure(e);
     }
 
     public void doShareCancel() {
+        ShareLog.i("share cancel");
         ShareUtil.recycle();
         shareCancel();
     }

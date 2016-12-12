@@ -191,6 +191,11 @@ public class WxShareInstance implements ShareInstance {
         });
     }
 
+    @Override
+    public boolean isInstall(Context context) {
+        return mIWXAPI.isWXAppInstalled();
+    }
+
     private void startFailed(Activity activity, ShareListener listener, Exception e) {
         activity.finish();
         listener.doShareFailure(e);

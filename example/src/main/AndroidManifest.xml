@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="me.shaohui.shareutilexample"
+        package="com.younglive.livestreaming"
         >
+
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:allowBackup="true"
@@ -12,18 +14,24 @@
             android:theme="@style/AppTheme"
             >
         <activity android:name=".MainActivity">
+        </activity>
+        <activity android:name="me.shaohui.shareutil._ShareActivity"/>
+
+        <activity-alias
+                android:name=".wxapi.WXEntryActivity"
+                android:exported="true"
+                android:targetActivity="me.shaohui.shareutil._ShareActivity"
+                />
+
+        <activity android:name=".LoginActivity">
+        </activity>
+        <activity android:name=".ShareActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
-        <activity android:name="me.shaohui.shareutil.WXEntryParent"/>
-        <activity-alias
-                android:name=".wxapi.WXPayEntryActivity"
-                android:exported="true"
-                android:targetActivity="me.shaohui.shareutil.WXEntryParent"/>
     </application>
 
 </manifest>

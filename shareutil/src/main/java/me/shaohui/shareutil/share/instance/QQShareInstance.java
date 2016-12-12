@@ -3,6 +3,8 @@ package me.shaohui.shareutil.share.instance;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.TextUtils;
 import com.tencent.connect.share.QQShare;
@@ -10,6 +12,7 @@ import com.tencent.connect.share.QzonePublish;
 import com.tencent.connect.share.QzoneShare;
 import com.tencent.tauth.Tencent;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Callable;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
@@ -159,6 +162,22 @@ public class QQShareInstance implements ShareInstance {
     @Override
     public void handleResult(Intent data) {
         Tencent.handleResultData(data, ShareUtil.mShareListener);
+    }
+
+    @Override
+    public boolean isInstall(Context context) {
+        PackageManager pm = context.getPackageManager();
+        if (pm == null) {
+            return false;
+        }
+
+        List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
+        for (PackageInfo info : packageInfos) {
+            if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

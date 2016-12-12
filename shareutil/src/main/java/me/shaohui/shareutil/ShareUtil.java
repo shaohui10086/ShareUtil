@@ -55,6 +55,13 @@ public class ShareUtil {
 
     static void action(Activity activity) {
         mShareInstance = getShareInstance(mPlatform, activity);
+
+        if (!mShareInstance.isInstall(activity)) {
+            activity.finish();
+            mShareListener.doShareFailure(new Exception("not install"));
+            return;
+        }
+
         switch (mType) {
             case TYPE_TEXT:
                 mShareInstance.shareText(mPlatform, mText, activity, mShareListener);
@@ -134,7 +141,15 @@ public class ShareUtil {
     public static void handleResult(Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
+            ShareLog.i("catch result");
             mShareInstance.handleResult(data);
+        } else {
+            if (mShareInstance == null) {
+                ShareLog.e("share instance is null");
+            }
+            if (data == null) {
+                ShareLog.e("data is null");
+            }
         }
     }
 
@@ -156,10 +171,17 @@ public class ShareUtil {
     }
 
     public static void recycle() {
-        mShareImageObject = null;
         mTitle = null;
         mSummary = null;
         mShareListener = null;
+
+        // bitmap recycle
+        if (mShareImageObject != null
+                && mShareImageObject.getBitmap() != null
+                && !mShareImageObject.getBitmap().isRecycled()) {
+            mShareImageObject.getBitmap().recycle();
+        }
+        mShareImageObject = null;
 
         if (mShareInstance != null) {
             mShareInstance.recycle();

@@ -1,6 +1,7 @@
 package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import com.tencent.mm.sdk.modelbase.BaseResp;
 import com.tencent.mm.sdk.modelmsg.SendAuth;
@@ -22,6 +23,8 @@ public abstract class LoginInstance {
     public abstract void fetchUserInfo(BaseToken token);
 
     public abstract void handleResult(int requestCode, int resultCode, Intent data);
+
+    public abstract boolean isInstall(Context context);
 
     public abstract void recycle();
 }

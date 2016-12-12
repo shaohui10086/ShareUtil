@@ -76,8 +76,8 @@ public class ImageDecoder {
         float scale = Math.max(origin.getHeight() / (float) targetSize,
                 origin.getWidth() / (float) targetSize);
         if (scale > 1) {
-            return Bitmap.createScaledBitmap(origin, (int) (origin.getHeight()/scale),
-                    (int) (origin.getWidth()/scale), false);
+            return Bitmap.createScaledBitmap(origin, (int) (origin.getWidth()/scale),
+                    (int) (origin.getHeight()/scale), false);
         } else {
             return origin;
         }
@@ -90,7 +90,9 @@ public class ImageDecoder {
             Response response = client.newCall(request).execute();
             BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
             sink.writeAll(response.body().source());
+
             sink.close();
+            response.close();
 
             return resultFile.getAbsolutePath();
         } catch (IOException e) {

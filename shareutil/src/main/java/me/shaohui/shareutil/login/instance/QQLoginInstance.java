@@ -1,11 +1,16 @@
 package me.shaohui.shareutil.login.instance;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import java.io.IOException;
+import java.util.List;
 import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
@@ -131,6 +136,22 @@ public class QQLoginInstance extends LoginInstance {
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
         Tencent.handleResultData(data, mIUiListener);
+    }
+
+    @Override
+    public boolean isInstall(Context context) {
+        PackageManager pm = context.getPackageManager();
+        if (pm == null) {
+            return false;
+        }
+
+        List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
+        for (PackageInfo info : packageInfos) {
+            if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.sina.weibo.sdk.api.share.SendMessageToWeiboResponse;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.constant.WBConstants;
+import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
@@ -85,6 +86,11 @@ public class WeiboShareInstance implements ShareInstance {
             default:
                 ShareUtil.mShareListener.doShareFailure(new Exception(baseResponse.errMsg));
         }
+    }
+
+    @Override
+    public boolean isInstall(Context context) {
+        return mWeiboShareAPI.isWeiboAppInstalled();
     }
 
     @Override

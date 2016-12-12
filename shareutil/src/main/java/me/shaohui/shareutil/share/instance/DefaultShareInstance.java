@@ -1,7 +1,9 @@
 package me.shaohui.shareutil.share.instance;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.text.TextUtils;
 import java.io.File;
@@ -89,7 +91,15 @@ public class DefaultShareInstance implements ShareInstance {
 
     @Override
     public void handleResult(Intent data) {
+        // 默认分享 do nothing
+    }
 
+    @Override
+    public boolean isInstall(Context context) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        return context.getPackageManager()
+                .resolveActivity(shareIntent, PackageManager.MATCH_DEFAULT_ONLY) != null;
     }
 
     @Override
