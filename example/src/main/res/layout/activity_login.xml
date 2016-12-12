@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/activity_login"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.younglive.livestreaming.LoginActivity"
+        >
+
+    <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerInParent="true"
+            >
+        <Button
+                android:id="@+id/login_wx"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="16dp"
+                android:text="微信登录"
+                />
+        <Button
+                android:id="@+id/login_weibo"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="16dp"
+                android:text="微博登录"
+                />
+        <Button
+                android:id="@+id/login_qq"
+                android:layout_width="200dp"
+                android:layout_height="60dp"
+                android:layout_marginBottom="16dp"
+                android:text="QQ登录"
+                />
+    </LinearLayout>
+
+</RelativeLayout>

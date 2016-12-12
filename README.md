@@ -2,8 +2,8 @@
 `ShareUtil`是一个综合性的分享及登录工具库，支持微信分享，微博分享，QQ分享，QQ空间分享以及Android系统默认分享，支持微信登录，微博登录以及QQ登录并获取用户信息。
 
 ## Preview 
-![share](./preview/shareutil_share.gif)
-![login](./preview/shareutil_login.gif)
+![share](/preview/shareutil_share.gif)
+![login](/preview/shareutil_login.gif)
 ## Feature
 
 1. 多种分享方式：
@@ -44,6 +44,8 @@
                     .qqId(QQ_ID)
                     .wxId(WX_ID)
                     .weiboId(WEIBO_ID)
+                    // 下面两个，如果不需要登录功能，可不填写
+                    .weiboRedirectUrl(REDIRECT_URL)
                     .wxSecret(WX_ID);
             ShareManager.init(config);
 
@@ -88,6 +90,7 @@
         QQ版本：3.1.0 lite版
         微博版本: 3.1.4
 3. 分享的bitmap，会在分享之后被回收掉，所以分享之后最好不要再对该bitmap做任何操作。
+4. example 中的代码可以参考，但是不可运行，因为需要保证包名以及签名文件和你申请各个平台id所填写信息保持一致
 
 ## ChangeLog
 
