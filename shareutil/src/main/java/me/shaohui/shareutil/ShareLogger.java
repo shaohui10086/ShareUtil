@@ -6,7 +6,7 @@ import android.util.Log;
  * Created by shaohui on 2016/12/8.
  */
 
-public class ShareLog {
+public class ShareLogger {
 
     public static void i(String info) {
         if (ShareManager.CONFIG.isDebug()) {

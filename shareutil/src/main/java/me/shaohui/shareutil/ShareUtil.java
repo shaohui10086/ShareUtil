@@ -141,14 +141,14 @@ public class ShareUtil {
     public static void handleResult(Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
-            ShareLog.i("catch result");
+            ShareLogger.i("catch result");
             mShareInstance.handleResult(data);
         } else {
             if (mShareInstance == null) {
-                ShareLog.e("share instance is null");
+                ShareLogger.e("share instance is null");
             }
             if (data == null) {
-                ShareLog.e("data is null");
+                ShareLogger.e("data is null");
             }
         }
     }

@@ -13,8 +13,6 @@
 # Java class files
 *.class
 
-*.jar
-
 # Generated files
 bin/
 gen/

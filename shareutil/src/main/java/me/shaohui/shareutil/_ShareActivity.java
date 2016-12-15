@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * Created by shaohui on 2016/11/19.
@@ -28,7 +27,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ShareLog.i("ShareActivity onCreate");
+        ShareLogger.i("ShareActivity onCreate");
         isNew = true;
 
         // init data
@@ -50,7 +49,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
-        ShareLog.i("ShareActivity onResume");
+        ShareLogger.i("ShareActivity onResume");
         if (isNew) {
             isNew = false;
         } else {
@@ -61,7 +60,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        ShareLog.i("ShareActivity onNewIntent");
+        ShareLogger.i("ShareActivity onNewIntent");
         // 处理回调
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(0, 0, intent);
@@ -74,7 +73,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        ShareLog.i("ShareActivity onActivityResult");
+        ShareLogger.i("ShareActivity onActivityResult");
         // 处理回调
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(requestCode, resultCode, data);
