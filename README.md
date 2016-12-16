@@ -18,11 +18,11 @@
 
 免第三方Jar包配置
 
-        compile 'me.shaohui:shareutil:1.3.4'
+        compile 'me.shaohui:shareutil:1.3.5'
 
 手动添加第三方jar
 
-		compile 'me.shaohui:shareutil:1.3.4.no_jar'
+		compile 'me.shaohui:shareutil:1.3.5.no_jar'
 
 ### 使用配置
 
@@ -95,17 +95,36 @@
 
 ## ChangeLog
 
-- 1.3.3  增加Debug模式
-- 1.3.2  修复若干分享相关的bug
-- 1.3.1  修复微博分享的bug
-- 1.3.0  重构使用方式，minSdkVersion - > 9
-- 1.2.8  增加分享失败Exception
-- 1.2.7  解决内存泄露的问题
+#### 1.3.5
+- 修复QQ分享media类型错误
+- 完善log
+- 开放Application Context调用
+- 增加检查外部存储
+- 重构部分代码
+
+#### 1.3.3  
+- 增加Debug模式
+
+#### 1.3.2  
+- 修复若干分享相关的bug
+
+#### 1.3.1
+- 修复微博分享的bug
+
+#### 1.3.0
+- 重构使用方式，minSdkVersion - > 9
+
+#### 1.2.8
+- 增加分享失败Exception
+
+#### 1.2.7
+- 解决内存泄露的问题
 
 ## TODO
 
-1. 完善Log
-2. 微信内存泄露（大概4kb）
+1. 微信内存泄露
+2. activity 承载内容减少
+3. 检查外部存储是否可用
 
 ## Thanks
 
