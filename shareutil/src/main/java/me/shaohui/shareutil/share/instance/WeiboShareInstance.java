@@ -14,7 +14,6 @@ import com.sina.weibo.sdk.api.share.SendMessageToWeiboResponse;
 import com.sina.weibo.sdk.api.share.SendMultiMessageToWeiboRequest;
 import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.sina.weibo.sdk.constant.WBConstants;
-import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ImageDecoder;
 import me.shaohui.shareutil.share.ShareImageObject;
@@ -34,7 +33,7 @@ public class WeiboShareInstance implements ShareInstance {
      * 微博分享限制thumb image必须小于2097152，否则点击分享会没有反应
      */
 
-    IWeiboShareAPI mWeiboShareAPI;
+    private IWeiboShareAPI mWeiboShareAPI;
 
     private static final int TARGET_SIZE = 800;
 
@@ -47,7 +46,6 @@ public class WeiboShareInstance implements ShareInstance {
     public void shareText(int platform, String text, Activity activity, ShareListener listener) {
         TextObject textObject = new TextObject();
         textObject.text = text;
-
         WeiboMultiMessage message = new WeiboMultiMessage();
         message.textObject = textObject;
 
@@ -104,29 +102,39 @@ public class WeiboShareInstance implements ShareInstance {
         Observable.fromEmitter(new Action1<Emitter<Pair<String, byte[]>>>() {
             @Override
             public void call(Emitter<Pair<String, byte[]>> emitter) {
-                if (!TextUtils.isEmpty(shareImageObject.getPathOrUrl())) {
-                    String path = ImageDecoder.decode(activity, shareImageObject.getPathOrUrl());
-                    Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
 
-                    emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
-                    bitmap.recycle();
+                try {
+                    String path = ImageDecoder.decode(activity, shareImageObject);
+                    emitter.onNext(Pair.create(path,
+                            ImageDecoder.compress(shareImageObject.getBitmap(), path, TARGET_SIZE)));
                     emitter.onCompleted();
-                } else if (shareImageObject.getBitmap() != null) {
-                    String path = ImageDecoder.decode(activity, shareImageObject.getBitmap());
-                    if (!TextUtils.isEmpty(path)) {
-                        Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
-
-                        emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
-                        bitmap.recycle();
-                        emitter.onCompleted();
-                    } else {
-                        emitter.onError(new IllegalArgumentException());
-                    }
-                } else {
-                    emitter.onError(new IllegalArgumentException());
+                } catch (Exception e) {
+                    emitter.onError(e);
                 }
+
+                //if (!TextUtils.isEmpty(shareImageObject.getPathOrUrl())) {
+                //    String path = ImageDecoder.decode(activity, shareImageObject.getPathOrUrl());
+                //    Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
+                //
+                //    emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
+                //    bitmap.recycle();
+                //    emitter.onCompleted();
+                //} else if (shareImageObject.getBitmap() != null) {
+                //    String path = ImageDecoder.decode(activity, shareImageObject.getBitmap());
+                //    if (!TextUtils.isEmpty(path)) {
+                //        Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
+                //
+                //        emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
+                //        bitmap.recycle();
+                //        emitter.onCompleted();
+                //    } else {
+                //        emitter.onError(new IllegalArgumentException());
+                //    }
+                //} else {
+                //    emitter.onError(new IllegalArgumentException());
+                //}
             }
-        }, Emitter.BackpressureMode.BUFFER)
+        }, Emitter.BackpressureMode.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnRequest(new Action1<Long>() {
@@ -156,7 +164,7 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        startFailed(activity, listener, new Exception(throwable));
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -166,10 +174,5 @@ public class WeiboShareInstance implements ShareInstance {
         request.transaction = String.valueOf(System.currentTimeMillis());
         request.multiMessage = message;
         mWeiboShareAPI.sendRequest(activity, request);
-    }
-
-    private void startFailed(Activity activity, ShareListener listener, Exception e) {
-        activity.finish();
-        listener.shareFailure(e);
     }
 }

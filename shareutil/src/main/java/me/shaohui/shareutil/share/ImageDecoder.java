@@ -3,16 +3,13 @@ package me.shaohui.shareutil.share;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import android.text.TextUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -27,49 +24,70 @@ import okio.Okio;
 
 public class ImageDecoder {
 
-    private static final int MAX_SIZE = 800;
     private static final String FILE_NAME = "share_image.jpg";
 
-    public static String decode(Context context, String pathOrUrl) {
+    public static String decode(Context context, ShareImageObject imageObject) throws Exception {
         File resultFile = cacheFile(context);
 
-        if (HttpUrl.parse(pathOrUrl) != null) {
+        if (!TextUtils.isEmpty(imageObject.getPathOrUrl())) {
+            return decode(context, imageObject.getPathOrUrl());
+        } else if (imageObject.getBitmap() != null) {
+            // save bitmap to file
+            FileOutputStream outputStream = new FileOutputStream(resultFile);
+            imageObject.getBitmap().compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+            outputStream.close();
+            return resultFile.getAbsolutePath();
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static Bitmap decodeBitmap(Context context, ShareImageObject imageObject)
+            throws Exception {
+        if (imageObject.getBitmap() != null) {
+            return imageObject.getBitmap();
+        } else if (!TextUtils.isEmpty(imageObject.getPathOrUrl())) {
+            String path = decode(context, imageObject.getPathOrUrl());
+            return BitmapFactory.decodeFile(path);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public static byte[] compress(Bitmap origin, String filePath, int targetSize) {
+        Bitmap thumb;
+        if (origin != null && !origin.isRecycled()) {
+            thumb = compress(origin, targetSize);
+        } else {
+            thumb = compress(filePath, targetSize, targetSize);
+        }
+        byte[] data = bmp2ByteArray(thumb);
+        thumb.recycle();
+        return data;
+    }
+
+    public static byte[] compress(Context context, ShareImageObject imageObject, int targetSize)
+            throws Exception {
+        Bitmap bitmap = decodeBitmap(context, imageObject);
+        Bitmap thumb = compress(bitmap, targetSize);
+        byte[] data = bmp2ByteArray(thumb);
+
+        bitmap.recycle();
+        thumb.recycle();
+        return data;
+    }
+
+    private static String decode(Context context, String pathOrUrl) throws Exception {
+        File resultFile = cacheFile(context);
+
+        if (new File(pathOrUrl).exists()) {
+            // copy file
+            return decodeFile(new File(pathOrUrl), resultFile);
+        } else if (HttpUrl.parse(pathOrUrl) != null) {
+            // download image
             return downloadImageToUri(pathOrUrl, resultFile);
         } else {
-            if (!new File(pathOrUrl).exists()) {
-                return null;
-            } else {
-                return decodeFile(new File(pathOrUrl), resultFile);
-            }
-        }
-    }
-
-    public static String decode(Context context, Bitmap bitmap) {
-        File resultFile = cacheFile(context);
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(resultFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            outputStream.close();
-            bitmap.recycle();
-            return resultFile.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Bitmap compress(Context context, String pathOrUrl) {
-        File resultFile = cacheFile(context);
-        if (HttpUrl.parse(pathOrUrl) != null) {
-            String path = downloadImageToUri(pathOrUrl, resultFile);
-            return compress(path, MAX_SIZE, MAX_SIZE);
-        } else {
-            if (new File(pathOrUrl).exists()) {
-                return compress(pathOrUrl, MAX_SIZE, MAX_SIZE);
-            } else {
-                return null;
-            }
+            throw new IllegalArgumentException("Please input a file path or http url");
         }
     }
 
@@ -77,65 +95,51 @@ public class ImageDecoder {
         float scale = Math.max(origin.getHeight() / (float) targetSize,
                 origin.getWidth() / (float) targetSize);
         if (scale > 1) {
-            return Bitmap.createScaledBitmap(origin, (int) (origin.getWidth()/scale),
-                    (int) (origin.getHeight()/scale), false);
+            return Bitmap.createScaledBitmap(origin, (int) (origin.getWidth() / scale),
+                    (int) (origin.getHeight() / scale), false);
         } else {
             return origin;
         }
     }
 
-    private static String downloadImageToUri(String url, File resultFile) {
+    private static String downloadImageToUri(String url, File resultFile) throws IOException {
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder().url(url).build();
-        try {
-            Response response = client.newCall(request).execute();
-            BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
-            sink.writeAll(response.body().source());
+        Response response = client.newCall(request).execute();
+        BufferedSink sink = Okio.buffer(Okio.sink(resultFile));
+        sink.writeAll(response.body().source());
 
-            sink.close();
-            response.close();
+        sink.close();
+        response.close();
 
-            return resultFile.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return resultFile.getAbsolutePath();
     }
 
     private static File cacheFile(Context context) {
         return new File(context.getExternalFilesDir(null), FILE_NAME);
     }
 
-    private static void copyFile(InputStream inputStream, OutputStream outputStream) {
-        try {
-            byte[] buffer = new byte[4096];
-            while (-1 != inputStream.read(buffer)) {
-                outputStream.write(buffer);
-            }
-
-            outputStream.flush();
-            inputStream.close();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+    private static void copyFile(InputStream inputStream, OutputStream outputStream)
+            throws IOException {
+        byte[] buffer = new byte[4096];
+        while (-1 != inputStream.read(buffer)) {
+            outputStream.write(buffer);
         }
+
+        outputStream.flush();
+        inputStream.close();
+        outputStream.close();
     }
 
-    private static String decodeFile(File origin, File result) {
-        try {
-            copyFile(new FileInputStream(origin), new FileOutputStream(result, false));
-
-            return result.getAbsolutePath();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
+    private static String decodeFile(File origin, File result) throws IOException {
+        copyFile(new FileInputStream(origin), new FileOutputStream(result, false));
+        return result.getAbsolutePath();
     }
 
     /**
      * get the thumbnail
      */
-    public static Bitmap compress(String imagePath, int width, int height) {
+    private static Bitmap compress(String imagePath, int width, int height) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(imagePath, options);

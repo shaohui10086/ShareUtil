@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
@@ -70,23 +71,13 @@ public class WxShareInstance implements ShareInstance {
 
             @Override
             public void call(Emitter<byte[]> emitter) {
-                if (shareImageObject.getBitmap() != null) {
-                    byte[] data = ImageDecoder.bmp2ByteArray(
-                            ImageDecoder.compress(shareImageObject.getBitmap(), TARGET_SIZE));
-
-                    emitter.onNext(data);
-                    emitter.onCompleted();
-                } else if (!TextUtils.isEmpty(shareImageObject.getPathOrUrl())) {
-                    String path = ImageDecoder.decode(activity, shareImageObject.getPathOrUrl());
-                    Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
-                    emitter.onNext(ImageDecoder.bmp2ByteArray(bitmap));
-                    bitmap.recycle();
-                    emitter.onCompleted();
-                } else {
-                    emitter.onError(new IllegalArgumentException());
+                try {
+                    emitter.onNext(ImageDecoder.compress(activity, shareImageObject, TARGET_SIZE));
+                } catch (Exception e) {
+                    emitter.onError(e);
                 }
             }
-        }, Emitter.BackpressureMode.BUFFER)
+        }, Emitter.BackpressureMode.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnRequest(new Action1<Long>() {
@@ -111,7 +102,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        startFailed(activity, listener, new Exception(throwable));
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -122,21 +113,12 @@ public class WxShareInstance implements ShareInstance {
         Observable.fromEmitter(new Action1<Emitter<Pair<Bitmap, Bitmap>>>() {
             @Override
             public void call(Emitter<Pair<Bitmap, Bitmap>> emitter) {
-                if (shareImageObject.getBitmap() != null) {
-                    Bitmap thumb = ImageDecoder.compress(shareImageObject.getBitmap(), TARGET_SIZE);
-
-                    emitter.onNext(Pair.create(shareImageObject.getBitmap(), thumb));
-                    emitter.onCompleted();
-                } else if (!TextUtils.isEmpty(shareImageObject.getPathOrUrl())) {
-                    String filePath =
-                            ImageDecoder.decode(activity, shareImageObject.getPathOrUrl());
-                    Bitmap bitmap = BitmapFactory.decodeFile(filePath);
+                try {
+                    Bitmap bitmap = ImageDecoder.decodeBitmap(activity, shareImageObject);
                     Bitmap thumb = ImageDecoder.compress(bitmap, TARGET_SIZE);
-
                     emitter.onNext(Pair.create(bitmap, thumb));
-                    emitter.onCompleted();
-                } else {
-                    emitter.onError(new IllegalArgumentException());
+                } catch (Exception e) {
+                    emitter.onError(e);
                 }
             }
         }, Emitter.BackpressureMode.BUFFER)
@@ -163,7 +145,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        startFailed(activity, listener, new Exception(throwable));
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
@@ -194,11 +176,6 @@ public class WxShareInstance implements ShareInstance {
     @Override
     public boolean isInstall(Context context) {
         return mIWXAPI.isWXAppInstalled();
-    }
-
-    private void startFailed(Activity activity, ShareListener listener, Exception e) {
-        activity.finish();
-        listener.shareFailure(e);
     }
 
     @Override
