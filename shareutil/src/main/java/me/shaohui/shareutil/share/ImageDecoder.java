@@ -3,6 +3,7 @@ package me.shaohui.shareutil.share;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.text.TextUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -11,12 +12,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import me.shaohui.shareutil.ShareLogger;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okio.BufferedSink;
 import okio.Okio;
+
+import static me.shaohui.shareutil.ShareLogger.INFO;
 
 /**
  * Created by shaohui on 2016/11/19.
@@ -115,8 +119,13 @@ public class ImageDecoder {
         return resultFile.getAbsolutePath();
     }
 
-    private static File cacheFile(Context context) {
-        return new File(context.getExternalFilesDir(null), FILE_NAME);
+    private static File cacheFile(Context context) throws Exception {
+        String state = Environment.getExternalStorageState();
+        if (state != null && state.equals(Environment.MEDIA_MOUNTED)) {
+            return new File(context.getExternalFilesDir(""), FILE_NAME);
+        } else {
+            throw new Exception(INFO.SD_CARD_NOT_AVAILABLE);
+        }
     }
 
     private static void copyFile(InputStream inputStream, OutputStream outputStream)

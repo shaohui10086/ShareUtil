@@ -11,6 +11,7 @@ import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 import java.io.IOException;
 import java.util.List;
+import me.shaohui.shareutil.ShareLogger;
 import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
@@ -29,13 +30,15 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static me.shaohui.shareutil.ShareLogger.INFO;
+
 /**
  * Created by shaohui on 2016/12/1.
  */
 
 public class QQLoginInstance extends LoginInstance {
 
-    public static final String SCOPE = "get_simple_userinfo";
+    private static final String SCOPE = "get_simple_userinfo";
 
     private static final String URL = "https://graph.qq.com/user/get_user_info";
 
@@ -54,28 +57,31 @@ public class QQLoginInstance extends LoginInstance {
         mIUiListener = new IUiListener() {
             @Override
             public void onComplete(Object o) {
-                QQToken token = QQToken.parse((JSONObject) o);
-                if (token == null) {
-                    mLoginListener.loginFailure(new Exception("login_failure"));
-                    return;
-                }
-
-                if (fetchUserInfo) {
-                    listener.beforeFetchUserInfo(token);
-                    fetchUserInfo(token);
-                } else {
-                    listener.loginSuccess(new LoginResult(LoginPlatform.QQ, token));
+                ShareLogger.i(INFO.QQ_AUTH_SUCCESS);
+                try {
+                    QQToken token = QQToken.parse((JSONObject) o);
+                    if (fetchUserInfo) {
+                        listener.beforeFetchUserInfo(token);
+                        fetchUserInfo(token);
+                    } else {
+                        listener.loginSuccess(new LoginResult(LoginPlatform.QQ, token));
+                    }
+                } catch (JSONException e) {
+                    ShareLogger.i(INFO.ILLEGAL_TOKEN);
+                    mLoginListener.loginFailure(e);
                 }
             }
 
             @Override
             public void onError(UiError uiError) {
+                ShareLogger.i(INFO.QQ_LOGIN_ERROR);
                 listener.loginFailure(
                         new Exception("QQError: " + uiError.errorCode + uiError.errorDetail));
             }
 
             @Override
             public void onCancel() {
+                ShareLogger.i(INFO.AUTH_CANCEL);
                 listener.loginCancel();
             }
         };
@@ -83,8 +89,6 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public void doLogin(Activity activity, final LoginListener listener, boolean fetchUserInfo) {
-        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity);
-
         mTencent.login(activity, SCOPE, mIUiListener);
     }
 
@@ -102,7 +106,7 @@ public class QQLoginInstance extends LoginInstance {
                     QQUser user = QQUser.parse(token.getOpenid(), jsonObject);
                     qqUserEmitter.onNext(user);
                 } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    ShareLogger.e(INFO.FETCH_USER_INOF_ERROR);
                     qqUserEmitter.onError(e);
                 }
             }

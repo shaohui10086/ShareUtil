@@ -35,12 +35,25 @@ public class ShareLogger {
         public static final String DEFAULT_QQ_SHARE_ERROR = "QQ share failed";
         public static final String QQ_NOT_SUPPORT_SHARE_TXT = "QQ not support share text";
         public static final String IMAGE_FETCH_ERROR = "Image fetch error";
+        public static final String SD_CARD_NOT_AVAILABLE = "The sd card is not available";
 
         // for login
         public static final String LOGIN_SUCCESS = "call login success";
         public static final String LOGIN_FAIl = "call login failed";
         public static final String LOGIN_CANCEL = "call login cancel";
         public static final String LOGIN_AUTH_SUCCESS = "call before fetch user info";
+        public static final String ILLEGAL_TOKEN = "Illegal token, please check your config";
+        public static final String QQ_LOGIN_ERROR = "QQ login error";
+        public static final String QQ_AUTH_SUCCESS = "QQ auth success";
+        public static final String WEIBO_AUTH_ERROR = "weibo auth error";
+
+        public static final String WX_ERR_SENT_FAILED = "Wx sent failed";
+        public static final String WX_ERR_UNSUPPORT = "Wx UnSupport";
+        public static final String WX_ERR_AUTH_DENIED = "Wx auth denied";
+        public static final String WX_ERR_AUTH_ERROR = "Wx auth error";
+
+        public static final String AUTH_CANCEL = "auth cancel";
+        public static final String FETCH_USER_INOF_ERROR = "Fetch user info error";
 
         // for shareActivity
         public static final String ACTIVITY_CREATE = "ShareActivity onCreate";

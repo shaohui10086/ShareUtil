@@ -22,6 +22,8 @@
         <activity
                 android:name="com.tencent.connect.common.AssistActivity"
                 android:configChanges="orientation|keyboardHidden"
+                android:launchMode="singleTask"
+                android:taskAffinity="me.shaohui.shareutil"
                 android:screenOrientation="behind"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar"
                 >
@@ -40,7 +42,7 @@
         </activity>
 
         <activity android:name="me.shaohui.shareutil._ShareActivity"
-                android:launchMode="singleTop"
+                android:launchMode="singleTask"
                 android:taskAffinity="me.shaohui.shareutil"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar">
             <intent-filter>

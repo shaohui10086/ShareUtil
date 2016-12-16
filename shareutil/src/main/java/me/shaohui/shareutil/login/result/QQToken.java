@@ -9,15 +9,10 @@ import org.json.JSONObject;
 
 public class QQToken extends BaseToken {
 
-    public static QQToken parse(JSONObject jsonObject) {
+    public static QQToken parse(JSONObject jsonObject) throws JSONException {
         QQToken token = new QQToken();
-        try {
-            token.setAccessToken(jsonObject.getString("access_token"));
-            token.setOpenid(jsonObject.getString("openid"));
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
+        token.setAccessToken(jsonObject.getString("access_token"));
+        token.setOpenid(jsonObject.getString("openid"));
         return token;
     }
 

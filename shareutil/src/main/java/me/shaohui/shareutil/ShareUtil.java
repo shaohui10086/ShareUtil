@@ -58,7 +58,6 @@ public class ShareUtil {
         mShareInstance = getShareInstance(mPlatform, activity);
 
         if (!mShareInstance.isInstall(activity)) {
-            activity.finish();
             mShareListener.shareFailure(new Exception(INFO.NOT_INSTALL));
             return;
         }
@@ -74,11 +73,6 @@ public class ShareUtil {
                 mShareInstance.shareMedia(mPlatform, mTitle, mTargetUrl, mSummary,
                         mShareImageObject, activity, mShareListener);
                 break;
-        }
-
-        // 默认系统分享没有回调，所以需要手动处理掉分享的activity
-        if (mPlatform == SharePlatform.DEFAULT) {
-            activity.finish();
         }
     }
 

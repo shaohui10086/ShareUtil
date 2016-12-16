@@ -12,7 +12,7 @@ import com.sina.weibo.sdk.auth.WeiboAuthListener;
 import com.sina.weibo.sdk.auth.sso.SsoHandler;
 import com.sina.weibo.sdk.exception.WeiboException;
 import java.io.IOException;
-import me.shaohui.shareutil.LoginUtil;
+import me.shaohui.shareutil.ShareLogger;
 import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
@@ -31,15 +31,13 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static me.shaohui.shareutil.ShareLogger.INFO;
+
 /**
  * Created by shaohui on 2016/12/1.
  */
 
 public class WeiboLoginInstance extends LoginInstance {
-
-    public static final String DEFAULT_REDIRECT_URL = "https://api.weibo.com/oauth2/default.html";
-
-    public static final String DEFAULT_SCOPE = "email";
 
     private static final String USER_INFO = "https://api.weibo.com/2/users/show.json";
 
@@ -73,11 +71,13 @@ public class WeiboLoginInstance extends LoginInstance {
 
             @Override
             public void onWeiboException(WeiboException e) {
+                ShareLogger.i(INFO.WEIBO_AUTH_ERROR);
                 listener.loginFailure(e);
             }
 
             @Override
             public void onCancel() {
+                ShareLogger.i(INFO.AUTH_CANCEL);
                 listener.loginCancel();
             }
         });
@@ -97,7 +97,7 @@ public class WeiboLoginInstance extends LoginInstance {
                     WeiboUser user = WeiboUser.parse(jsonObject);
                     weiboUserEmitter.onNext(user);
                 } catch (IOException | JSONException e) {
-                    e.printStackTrace();
+                    ShareLogger.e(INFO.FETCH_USER_INOF_ERROR);
                     weiboUserEmitter.onError(e);
                 }
             }
@@ -109,7 +109,6 @@ public class WeiboLoginInstance extends LoginInstance {
                     public void call(WeiboUser weiboUser) {
                         mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.WEIBO, token, weiboUser));
-                        LoginUtil.recycle();
                     }
                 }, new Action1<Throwable>() {
                     @Override
