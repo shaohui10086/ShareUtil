@@ -75,16 +75,16 @@ public class WeiboShareInstance implements ShareInstance {
 
         switch (baseResponse.errCode) {
             case WBConstants.ErrorCode.ERR_OK:
-                ShareUtil.mShareListener.doShareSuccess();
+                ShareUtil.mShareListener.shareSuccess();
                 break;
             case WBConstants.ErrorCode.ERR_FAIL:
-                ShareUtil.mShareListener.doShareFailure(new Exception(baseResponse.errMsg));
+                ShareUtil.mShareListener.shareFailure(new Exception(baseResponse.errMsg));
                 break;
             case WBConstants.ErrorCode.ERR_CANCEL:
-                ShareUtil.mShareListener.doShareCancel();
+                ShareUtil.mShareListener.shareCancel();
                 break;
             default:
-                ShareUtil.mShareListener.doShareFailure(new Exception(baseResponse.errMsg));
+                ShareUtil.mShareListener.shareFailure(new Exception(baseResponse.errMsg));
         }
     }
 
@@ -170,6 +170,6 @@ public class WeiboShareInstance implements ShareInstance {
 
     private void startFailed(Activity activity, ShareListener listener, Exception e) {
         activity.finish();
-        listener.doShareFailure(e);
+        listener.shareFailure(e);
     }
 }

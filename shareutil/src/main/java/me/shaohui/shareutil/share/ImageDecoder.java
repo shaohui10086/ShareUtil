@@ -28,6 +28,7 @@ import okio.Okio;
 public class ImageDecoder {
 
     private static final int MAX_SIZE = 800;
+    private static final String FILE_NAME = "share_image.jpg";
 
     public static String decode(Context context, String pathOrUrl) {
         File resultFile = cacheFile(context);
@@ -102,7 +103,7 @@ public class ImageDecoder {
     }
 
     private static File cacheFile(Context context) {
-        return new File(context.getExternalFilesDir(null), "share_image.jpg");
+        return new File(context.getExternalFilesDir(null), FILE_NAME);
     }
 
     private static void copyFile(InputStream inputStream, OutputStream outputStream) {

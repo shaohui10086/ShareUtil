@@ -84,14 +84,14 @@ public class DefaultShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        listener.doShareFailure(new Exception(throwable));
+                        listener.shareFailure(new Exception(throwable));
                     }
                 });
     }
 
     @Override
     public void handleResult(Intent data) {
-        // 默认分享 do nothing
+        // Default share, do nothing
     }
 
     @Override

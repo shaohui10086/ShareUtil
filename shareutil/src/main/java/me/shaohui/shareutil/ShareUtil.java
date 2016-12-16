@@ -21,6 +21,7 @@ import me.shaohui.shareutil.share.instance.QQShareInstance;
 import me.shaohui.shareutil.share.instance.ShareInstance;
 import me.shaohui.shareutil.share.instance.WeiboShareInstance;
 import me.shaohui.shareutil.share.instance.WxShareInstance;
+import static me.shaohui.shareutil.ShareLogger.INFO;
 
 /**
  * Created by shaohui on 2016/11/18.
@@ -41,9 +42,9 @@ public class ShareUtil {
 
     private static ShareInstance mShareInstance;
 
-    final static int TYPE_IMAGE = 1;
-    final static int TYPE_TEXT = 2;
-    final static int TYPE_MEDIA = 3;
+    private final static int TYPE_IMAGE = 1;
+    private final static int TYPE_TEXT = 2;
+    private final static int TYPE_MEDIA = 3;
 
     private static int mType;
     private static int mPlatform;
@@ -58,7 +59,7 @@ public class ShareUtil {
 
         if (!mShareInstance.isInstall(activity)) {
             activity.finish();
-            mShareListener.doShareFailure(new Exception("not install"));
+            mShareListener.shareFailure(new Exception(INFO.NOT_INSTALL));
             return;
         }
 
@@ -86,7 +87,7 @@ public class ShareUtil {
         mType = TYPE_TEXT;
         mText = text;
         mPlatform = platform;
-        mShareListener = listener;
+        mShareListener = buildProxyListener(listener);
 
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
@@ -96,7 +97,7 @@ public class ShareUtil {
         mType = TYPE_IMAGE;
         mPlatform = platform;
         mShareImageObject = new ShareImageObject(urlOrPath);
-        mShareListener = listener;
+        mShareListener = buildProxyListener(listener);
 
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
@@ -106,7 +107,7 @@ public class ShareUtil {
         mType = TYPE_IMAGE;
         mPlatform = platform;
         mShareImageObject = new ShareImageObject(bitmap);
-        mShareListener = listener;
+        mShareListener = buildProxyListener(listener);
 
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
@@ -119,7 +120,7 @@ public class ShareUtil {
         mSummary = summary;
         mTargetUrl = targetUrl;
         mTitle = title;
-        mShareListener = listener;
+        mShareListener = buildProxyListener(listener);
 
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
@@ -133,23 +134,25 @@ public class ShareUtil {
         mSummary = summary;
         mTargetUrl = targetUrl;
         mTitle = title;
-        mShareListener = listener;
+        mShareListener = buildProxyListener(listener);
 
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
+    }
+
+    private static ShareListener buildProxyListener(ShareListener listener) {
+        return new ShareListenerProxy(listener);
     }
 
     public static void handleResult(Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
-            ShareLogger.i("catch result");
             mShareInstance.handleResult(data);
+        } else if (data == null) {
+            if (mPlatform != SharePlatform.WEIBO) {
+                ShareLogger.e(INFO.HANDLE_DATA_NULL);
+            }
         } else {
-            if (mShareInstance == null) {
-                ShareLogger.e("share instance is null");
-            }
-            if (data == null) {
-                ShareLogger.e("data is null");
-            }
+            ShareLogger.e(INFO.UNKNOWN_ERROR);
         }
     }
 

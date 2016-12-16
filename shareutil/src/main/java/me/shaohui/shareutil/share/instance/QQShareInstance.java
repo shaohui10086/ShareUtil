@@ -25,6 +25,8 @@ import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static me.shaohui.shareutil.ShareLogger.INFO;
+
 /**
  * Created by shaohui on 2016/11/18.
  */
@@ -42,7 +44,7 @@ public class QQShareInstance implements ShareInstance {
         if (platform == SharePlatform.QZONE) {
             shareToQZoneForText(text, activity, listener);
         } else {
-            startFailed(activity, listener, new Exception("qq not support share text"));
+            startFailed(activity, listener, new Exception(INFO.QQ_NOT_SUPPORT_SHARE_TXT));
         }
     }
 
@@ -90,7 +92,7 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForMedia(title, summary, targetUrl, s, activity, listener);
                             }
                         } else {
-                            startFailed(activity, listener, new Exception("image fetch error"));
+                            startFailed(activity, listener, new Exception(INFO.IMAGE_FETCH_ERROR));
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -143,7 +145,7 @@ public class QQShareInstance implements ShareInstance {
                                 shareToQQForImage(localPath, activity, listener);
                             }
                         } else {
-                            startFailed(activity, listener, new Exception("image fetch error"));
+                            startFailed(activity, listener, new Exception(INFO.IMAGE_FETCH_ERROR));
                         }
                     }
                 }, new Action1<Throwable>() {
@@ -156,7 +158,7 @@ public class QQShareInstance implements ShareInstance {
 
     private void startFailed(Activity activity, ShareListener listener, Exception e) {
         activity.finish();
-        listener.doShareFailure(e);
+        listener.shareFailure(e);
     }
 
     @Override
