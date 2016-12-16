@@ -35,6 +35,19 @@ public class ShareLogger {
         public static final String DEFAULT_QQ_SHARE_ERROR = "QQ share failed";
         public static final String QQ_NOT_SUPPORT_SHARE_TXT = "QQ not support share text";
         public static final String IMAGE_FETCH_ERROR = "Image fetch error";
+
+        // for login
+        public static final String LOGIN_SUCCESS = "call login success";
+        public static final String LOGIN_FAIl = "call login failed";
+        public static final String LOGIN_CANCEL = "call login cancel";
+        public static final String LOGIN_AUTH_SUCCESS = "call before fetch user info";
+
+        // for shareActivity
+        public static final String ACTIVITY_CREATE = "ShareActivity onCreate";
+        public static final String ACTIVITY_RESUME = "ShareActivity onResume";
+        public static final String ACTIVITY_RESULT = "ShareActivity onActivityResult";
+        public static final String ACTIVITY_NEW_INTENT = "ShareActivity onNewIntent";
+
     }
 
 }

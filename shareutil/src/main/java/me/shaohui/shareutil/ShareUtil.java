@@ -221,4 +221,40 @@ public class ShareUtil {
         IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
     }
+    
+    private static class ShareListenerProxy extends ShareListener {
+
+        private final ShareListener mShareListener;
+
+        ShareListenerProxy(ShareListener listener) {
+            mShareListener = listener;
+        }
+
+        @Override
+        public void shareSuccess() {
+            ShareLogger.i(INFO.SHARE_SUCCESS);
+            ShareUtil.recycle();
+            mShareListener.shareSuccess();
+        }
+
+        @Override
+        public void shareFailure(Exception e) {
+            ShareLogger.i(INFO.SHARE_FAILURE);
+            ShareUtil.recycle();
+            mShareListener.shareFailure(e);
+        }
+
+        @Override
+        public void shareCancel() {
+            ShareLogger.i(INFO.SHARE_CANCEL);
+            ShareUtil.recycle();
+            mShareListener.shareCancel();
+        }
+
+        @Override
+        public void shareRequest() {
+            ShareLogger.i(INFO.SHARE_REQUEST);
+            mShareListener.shareRequest();
+        }
+    }
 }

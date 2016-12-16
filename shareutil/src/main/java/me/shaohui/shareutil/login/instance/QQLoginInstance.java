@@ -56,7 +56,7 @@ public class QQLoginInstance extends LoginInstance {
             public void onComplete(Object o) {
                 QQToken token = QQToken.parse((JSONObject) o);
                 if (token == null) {
-                    mLoginListener.doLoginFailure(new Exception("login_failure"));
+                    mLoginListener.loginFailure(new Exception("login_failure"));
                     return;
                 }
 
@@ -64,7 +64,7 @@ public class QQLoginInstance extends LoginInstance {
                     listener.beforeFetchUserInfo(token);
                     fetchUserInfo(token);
                 } else {
-                    listener.doLoginSuccess(new LoginResult(LoginPlatform.QQ, token));
+                    listener.loginSuccess(new LoginResult(LoginPlatform.QQ, token));
                 }
             }
 
@@ -112,13 +112,13 @@ public class QQLoginInstance extends LoginInstance {
                 .subscribe(new Action1<QQUser>() {
                     @Override
                     public void call(QQUser qqUser) {
-                        mLoginListener.doLoginSuccess(
+                        mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.QQ, token, qqUser));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.doLoginFailure(new Exception(throwable));
+                        mLoginListener.loginFailure(new Exception(throwable));
                     }
                 });
     }

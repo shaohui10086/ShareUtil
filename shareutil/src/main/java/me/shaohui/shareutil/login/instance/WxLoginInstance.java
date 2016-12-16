@@ -84,13 +84,13 @@ public class WxLoginInstance extends LoginInstance {
                 .subscribe(new Action1<WxUser>() {
                     @Override
                     public void call(WxUser wxUser) {
-                        mLoginListener.doLoginSuccess(
+                        mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.WX, token, wxUser));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.doLoginFailure(new Exception(throwable));
+                        mLoginListener.loginFailure(new Exception(throwable));
                     }
                 });
     }
@@ -111,19 +111,19 @@ public class WxLoginInstance extends LoginInstance {
                             getToken(resp.code);
                             break;
                         case BaseResp.ErrCode.ERR_USER_CANCEL:
-                            mLoginListener.doLoginCancel();
+                            mLoginListener.loginCancel();
                             break;
                         case BaseResp.ErrCode.ERR_SENT_FAILED:
-                            mLoginListener.doLoginFailure(new Exception("wx_err_sent_failed"));
+                            mLoginListener.loginFailure(new Exception("wx_err_sent_failed"));
                             break;
                         case BaseResp.ErrCode.ERR_UNSUPPORT:
-                            mLoginListener.doLoginFailure(new Exception("wx_err_unsupport"));
+                            mLoginListener.loginFailure(new Exception("wx_err_unsupport"));
                             break;
                         case BaseResp.ErrCode.ERR_AUTH_DENIED:
-                            mLoginListener.doLoginFailure(new Exception("wx_auth_denied"));
+                            mLoginListener.loginFailure(new Exception("wx_auth_denied"));
                             break;
                         default:
-                            mLoginListener.doLoginFailure(new Exception("wx_login_error"));
+                            mLoginListener.loginFailure(new Exception("wx_login_error"));
                     }
                 }
             }
@@ -159,13 +159,13 @@ public class WxLoginInstance extends LoginInstance {
                             mLoginListener.beforeFetchUserInfo(wxToken);
                             fetchUserInfo(wxToken);
                         } else {
-                            mLoginListener.doLoginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
+                            mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
                         }
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.doLoginFailure(new Exception(throwable.getMessage()));
+                        mLoginListener.loginFailure(new Exception(throwable.getMessage()));
                     }
                 });
     }

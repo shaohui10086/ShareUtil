@@ -1,15 +1,18 @@
 package me.shaohui.shareutil;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
+import me.shaohui.shareutil.login.LoginResult;
 import me.shaohui.shareutil.login.instance.LoginInstance;
 import me.shaohui.shareutil.login.instance.QQLoginInstance;
 import me.shaohui.shareutil.login.instance.WeiboLoginInstance;
 import me.shaohui.shareutil.login.instance.WxLoginInstance;
+import me.shaohui.shareutil.login.result.BaseToken;
+
+import static me.shaohui.shareutil.ShareLogger.INFO;
 
 /**
  * Created by shaohui on 2016/12/3.
@@ -35,11 +38,8 @@ public class LoginUtil {
     public static void login(Context context, @LoginPlatform.Platform int platform,
             LoginListener listener, boolean fetchUserInfo) {
         mPlatform = platform;
-        mLoginListener = listener;
+        mLoginListener = new LoginListenerProxy(listener);
         isFetchUserInfo = fetchUserInfo;
-        if (context instanceof Application) {
-            listener.doLoginFailure(new Exception("don't support the application context"));
-        }
         context.startActivity(_ShareActivity.newInstance(context, TYPE));
     }
 
@@ -72,5 +72,41 @@ public class LoginUtil {
         mLoginListener = null;
         mPlatform = 0;
         isFetchUserInfo = false;
+    }
+
+    private static class LoginListenerProxy extends LoginListener {
+
+        private LoginListener mListener;
+
+        LoginListenerProxy(LoginListener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        public void loginSuccess(LoginResult result) {
+            ShareLogger.i(INFO.LOGIN_SUCCESS);
+            mListener.loginSuccess(result);
+            recycle();
+        }
+
+        @Override
+        public void loginFailure(Exception e) {
+            ShareLogger.i(INFO.LOGIN_FAIl);
+            mListener.loginFailure(e);
+            recycle();
+        }
+
+        @Override
+        public void loginCancel() {
+            ShareLogger.i(INFO.LOGIN_CANCEL);
+            mListener.loginCancel();
+            recycle();
+        }
+
+        @Override
+        public void beforeFetchUserInfo(BaseToken token) {
+            ShareLogger.i(INFO.LOGIN_AUTH_SUCCESS);
+            mListener.beforeFetchUserInfo(token);
+        }
     }
 }

@@ -67,7 +67,7 @@ public class WeiboLoginInstance extends LoginInstance {
                     listener.beforeFetchUserInfo(weiboToken);
                     fetchUserInfo(weiboToken);
                 } else {
-                    listener.doLoginSuccess(new LoginResult(LoginPlatform.WEIBO, weiboToken));
+                    listener.loginSuccess(new LoginResult(LoginPlatform.WEIBO, weiboToken));
                 }
             }
 
@@ -107,14 +107,14 @@ public class WeiboLoginInstance extends LoginInstance {
                 .subscribe(new Action1<WeiboUser>() {
                     @Override
                     public void call(WeiboUser weiboUser) {
-                        mLoginListener.doLoginSuccess(
+                        mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.WEIBO, token, weiboUser));
                         LoginUtil.recycle();
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-                        mLoginListener.doLoginFailure(new Exception(throwable));
+                        mLoginListener.loginFailure(new Exception(throwable));
                     }
                 });
     }

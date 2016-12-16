@@ -190,7 +190,7 @@ public class QQShareInstance implements ShareInstance {
     private void shareToQQForMedia(String title, String summary, String targetUrl, String thumbUrl,
             Activity activity, ShareListener listener) {
         final Bundle params = new Bundle();
-        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_AUDIO);
+        params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         params.putString(QQShare.SHARE_TO_QQ_TITLE, title);
         params.putString(QQShare.SHARE_TO_QQ_SUMMARY, summary);
         params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, targetUrl);
