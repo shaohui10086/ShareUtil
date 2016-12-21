@@ -18,11 +18,11 @@
 
 免第三方Jar包配置
 
-        compile 'me.shaohui:shareutil:1.3.5'
+        compile 'me.shaohui.shareutil:shareutil:1.3.5'
 
 手动添加第三方jar
 
-		compile 'me.shaohui:shareutil:1.3.5.no_jar'
+		compile 'me.shaohui.shareutil:shareutil:1.3.5.no_jar'
 
 ### 使用配置
 
