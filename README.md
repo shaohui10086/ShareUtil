@@ -18,11 +18,11 @@
 
 免第三方Jar包配置
 
-        compile 'me.shaohui.shareutil:shareutil:1.3.5'
+        compile 'me.shaohui.shareutil:shareutil:1.3.6'
 
 手动添加第三方jar
 
-		compile 'me.shaohui.shareutil:shareutil:1.3.5.no_jar'
+		compile 'me.shaohui.shareutil:shareutil:1.3.6.no_jar'
 
 ### 使用配置
 
@@ -94,6 +94,9 @@
 5. ShareListener的回调结果仅供参考，不可当做分享是否返回的依据，它并不是那么完全可靠，因为某些操作，例如微博分享取消，但是用户选择了保存草稿，这时候客户端并不会收到回调，所以也就不会调用ShareListener的onCancel
 
 ## ChangeLog
+
+#### 1.3.6
+- `ShareUtil`新增`isInstalled`方法，方便检查客户端是否安装
 
 #### 1.3.5
 - 修复QQ分享media类型错误

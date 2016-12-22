@@ -13,6 +13,9 @@ import com.sina.weibo.sdk.api.share.WeiboShareSDK;
 import com.tencent.mm.sdk.openapi.IWXAPI;
 import com.tencent.mm.sdk.openapi.WXAPIFactory;
 import java.util.List;
+import java.util.Locale;
+
+import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
@@ -59,6 +62,7 @@ public class ShareUtil {
 
         if (!mShareInstance.isInstall(activity)) {
             mShareListener.shareFailure(new Exception(INFO.NOT_INSTALL));
+            activity.finish();
             return;
         }
 
@@ -190,6 +194,24 @@ public class ShareUtil {
      * 检查客户端是否安装
      */
 
+    public static boolean isInstalled(@SharePlatform.Platform int platform, Context context) {
+        switch (platform) {
+            case SharePlatform.QQ:
+            case SharePlatform.QZONE:
+                return isQQInstalled(context);
+            case SharePlatform.WEIBO:
+                return isWeiBoInstalled(context);
+            case SharePlatform.WX:
+            case SharePlatform.WX_TIMELINE:
+                return isWeiXinInstalled(context);
+            case SharePlatform.DEFAULT:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    @Deprecated
     public static boolean isQQInstalled(@NonNull Context context) {
         PackageManager pm = context.getPackageManager();
         if (pm == null) {
@@ -198,19 +220,22 @@ public class ShareUtil {
 
         List<PackageInfo> packageInfos = pm.getInstalledPackages(0);
         for (PackageInfo info : packageInfos) {
-            if (TextUtils.equals(info.packageName.toLowerCase(), "com.tencent.mobileqq")) {
+            if (TextUtils.equals(info.packageName.toLowerCase(Locale.getDefault()),
+                    "com.tencent.mobileqq")) {
                 return true;
             }
         }
         return false;
     }
 
+    @Deprecated
     public static boolean isWeiBoInstalled(@NonNull Context context) {
         IWeiboShareAPI shareAPI =
                 WeiboShareSDK.createWeiboAPI(context, ShareManager.CONFIG.getWeiboId());
         return shareAPI.isWeiboAppInstalled();
     }
 
+    @Deprecated
     public static boolean isWeiXinInstalled(Context context) {
         IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
