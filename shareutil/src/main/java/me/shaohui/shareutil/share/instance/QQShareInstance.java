@@ -45,6 +45,7 @@ public class QQShareInstance implements ShareInstance {
         if (platform == SharePlatform.QZONE) {
             shareToQZoneForText(text, activity, listener);
         } else {
+            activity.finish();
             listener.shareFailure(new Exception(INFO.QQ_NOT_SUPPORT_SHARE_TXT));
         }
     }
@@ -85,6 +86,7 @@ public class QQShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });
@@ -124,6 +126,7 @@ public class QQShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });

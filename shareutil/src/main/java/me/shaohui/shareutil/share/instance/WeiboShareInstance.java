@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.text.TextUtils;
 import android.util.Pair;
 import com.sina.weibo.sdk.api.ImageObject;
@@ -35,7 +36,9 @@ public class WeiboShareInstance implements ShareInstance {
 
     private IWeiboShareAPI mWeiboShareAPI;
 
-    private static final int TARGET_SIZE = 800;
+    private static final int TARGET_SIZE = 1024;
+
+    private static final int TARGET_LENGTH = 2097152;
 
     public WeiboShareInstance(Context context, String appId) {
         mWeiboShareAPI = WeiboShareSDK.createWeiboAPI(context, appId);
@@ -102,37 +105,14 @@ public class WeiboShareInstance implements ShareInstance {
         Observable.fromEmitter(new Action1<Emitter<Pair<String, byte[]>>>() {
             @Override
             public void call(Emitter<Pair<String, byte[]>> emitter) {
-
                 try {
                     String path = ImageDecoder.decode(activity, shareImageObject);
                     emitter.onNext(Pair.create(path,
-                            ImageDecoder.compress(shareImageObject.getBitmap(), path, TARGET_SIZE)));
+                            ImageDecoder.compress2Byte(path, TARGET_SIZE, TARGET_LENGTH)));
                     emitter.onCompleted();
                 } catch (Exception e) {
                     emitter.onError(e);
                 }
-
-                //if (!TextUtils.isEmpty(shareImageObject.getPathOrUrl())) {
-                //    String path = ImageDecoder.decode(activity, shareImageObject.getPathOrUrl());
-                //    Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
-                //
-                //    emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
-                //    bitmap.recycle();
-                //    emitter.onCompleted();
-                //} else if (shareImageObject.getBitmap() != null) {
-                //    String path = ImageDecoder.decode(activity, shareImageObject.getBitmap());
-                //    if (!TextUtils.isEmpty(path)) {
-                //        Bitmap bitmap = ImageDecoder.compress(path, TARGET_SIZE, TARGET_SIZE);
-                //
-                //        emitter.onNext(Pair.create(path, ImageDecoder.bmp2ByteArray(bitmap)));
-                //        bitmap.recycle();
-                //        emitter.onCompleted();
-                //    } else {
-                //        emitter.onError(new IllegalArgumentException());
-                //    }
-                //} else {
-                //    emitter.onError(new IllegalArgumentException());
-                //}
             }
         }, Emitter.BackpressureMode.DROP)
                 .subscribeOn(Schedulers.io())
@@ -164,6 +144,7 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });

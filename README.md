@@ -18,11 +18,11 @@
 
 免第三方Jar包配置
 
-        compile 'me.shaohui.shareutil:shareutil:1.3.6'
+        compile 'me.shaohui.shareutil:shareutil:1.3.7'
 
 手动添加第三方jar
 
-		compile 'me.shaohui.shareutil:shareutil:1.3.6.no_jar'
+		compile 'me.shaohui.shareutil:shareutil:1.3.7.no_jar'
 
 ### 使用配置
 
@@ -95,6 +95,10 @@
 
 ## ChangeLog
 
+#### 1.3.7
+- 修复微信分享大图没反应bug
+- 修复在5.0以下设备使用登录功能会意外收到登录取消回调
+
 #### 1.3.6
 - `ShareUtil`新增`isInstalled`方法，方便检查客户端是否安装
 
@@ -126,6 +130,7 @@
 ## TODO
 
 1. 微信内存泄露
+2. 图片加载失败，关闭Activity
 
 ## Thanks
 

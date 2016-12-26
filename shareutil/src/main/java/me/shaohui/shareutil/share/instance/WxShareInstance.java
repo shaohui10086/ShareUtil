@@ -42,7 +42,7 @@ public class WxShareInstance implements ShareInstance {
 
     private IWXAPI mIWXAPI;
 
-    private static final int THUMB_SIZE = 144;
+    private static final int THUMB_SIZE = 32 * 1024 * 8;
 
     private static final int TARGET_SIZE = 200;
 
@@ -72,7 +72,8 @@ public class WxShareInstance implements ShareInstance {
             @Override
             public void call(Emitter<byte[]> emitter) {
                 try {
-                    emitter.onNext(ImageDecoder.compress(activity, shareImageObject, TARGET_SIZE));
+                    String imagePath = ImageDecoder.decode(activity, shareImageObject);
+                    emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
                 } catch (Exception e) {
                     emitter.onError(e);
                 }
@@ -102,6 +103,7 @@ public class WxShareInstance implements ShareInstance {
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });
@@ -110,13 +112,13 @@ public class WxShareInstance implements ShareInstance {
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
             final Activity activity, final ShareListener listener) {
-        Observable.fromEmitter(new Action1<Emitter<Pair<Bitmap, Bitmap>>>() {
+        Observable.fromEmitter(new Action1<Emitter<Pair<Bitmap, byte[]>>>() {
             @Override
-            public void call(Emitter<Pair<Bitmap, Bitmap>> emitter) {
+            public void call(Emitter<Pair<Bitmap, byte[]>> emitter) {
                 try {
-                    Bitmap bitmap = ImageDecoder.decodeBitmap(activity, shareImageObject);
-                    Bitmap thumb = ImageDecoder.compress(bitmap, TARGET_SIZE);
-                    emitter.onNext(Pair.create(bitmap, thumb));
+                    String imagePath = ImageDecoder.decode(activity, shareImageObject);
+                    emitter.onNext(Pair.create(BitmapFactory.decodeFile(imagePath),
+                            ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE)));
                 } catch (Exception e) {
                     emitter.onError(e);
                 }
@@ -130,21 +132,21 @@ public class WxShareInstance implements ShareInstance {
                         listener.shareRequest();
                     }
                 })
-                .subscribe(new Action1<Pair<Bitmap, Bitmap>>() {
+                .subscribe(new Action1<Pair<Bitmap, byte[]>>() {
                     @Override
-                    public void call(Pair<Bitmap, Bitmap> pair) {
+                    public void call(Pair<Bitmap, byte[]> pair) {
                         WXImageObject imageObject = new WXImageObject(pair.first);
 
                         WXMediaMessage message = new WXMediaMessage();
                         message.mediaObject = imageObject;
-                        message.thumbData = ImageDecoder.bmp2ByteArray(pair.second);
-                        pair.second.recycle();
+                        message.thumbData = pair.second;
 
                         sendMessage(platform, message, buildTransaction("image"));
                     }
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
+                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });

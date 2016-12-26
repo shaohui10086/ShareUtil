@@ -46,41 +46,6 @@ public class ImageDecoder {
         }
     }
 
-    public static Bitmap decodeBitmap(Context context, ShareImageObject imageObject)
-            throws Exception {
-        if (imageObject.getBitmap() != null) {
-            return imageObject.getBitmap();
-        } else if (!TextUtils.isEmpty(imageObject.getPathOrUrl())) {
-            String path = decode(context, imageObject.getPathOrUrl());
-            return BitmapFactory.decodeFile(path);
-        } else {
-            throw new IllegalArgumentException();
-        }
-    }
-
-    public static byte[] compress(Bitmap origin, String filePath, int targetSize) {
-        Bitmap thumb;
-        if (origin != null && !origin.isRecycled()) {
-            thumb = compress(origin, targetSize);
-        } else {
-            thumb = compress(filePath, targetSize, targetSize);
-        }
-        byte[] data = bmp2ByteArray(thumb);
-        thumb.recycle();
-        return data;
-    }
-
-    public static byte[] compress(Context context, ShareImageObject imageObject, int targetSize)
-            throws Exception {
-        Bitmap bitmap = decodeBitmap(context, imageObject);
-        Bitmap thumb = compress(bitmap, targetSize);
-        byte[] data = bmp2ByteArray(thumb);
-
-        bitmap.recycle();
-        thumb.recycle();
-        return data;
-    }
-
     private static String decode(Context context, String pathOrUrl) throws Exception {
         File resultFile = cacheFile(context);
 
@@ -92,17 +57,6 @@ public class ImageDecoder {
             return downloadImageToUri(pathOrUrl, resultFile);
         } else {
             throw new IllegalArgumentException("Please input a file path or http url");
-        }
-    }
-
-    public static Bitmap compress(Bitmap origin, int targetSize) {
-        float scale = Math.max(origin.getHeight() / (float) targetSize,
-                origin.getWidth() / (float) targetSize);
-        if (scale > 1) {
-            return Bitmap.createScaledBitmap(origin, (int) (origin.getWidth() / scale),
-                    (int) (origin.getHeight() / scale), false);
-        } else {
-            return origin;
         }
     }
 
@@ -145,10 +99,7 @@ public class ImageDecoder {
         return result.getAbsolutePath();
     }
 
-    /**
-     * get the thumbnail
-     */
-    private static Bitmap compress(String imagePath, int width, int height) {
+    public static byte[] compress2Byte(String imagePath, int size, int length) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(imagePath, options);
@@ -157,37 +108,25 @@ public class ImageDecoder {
         int outW = options.outWidth;
         int inSampleSize = 1;
 
-        if (outH > height || outW > width) {
-            int halfH = outH / 2;
-            int halfW = outW / 2;
-
-            while ((halfH / inSampleSize) > height && (halfW / inSampleSize) > width) {
-                inSampleSize *= 2;
-            }
+        while (outH / inSampleSize > size || outW / inSampleSize > size) {
+            inSampleSize *= 2;
         }
 
         options.inSampleSize = inSampleSize;
-
         options.inJustDecodeBounds = false;
 
-        int heightRatio = (int) Math.ceil(options.outHeight / (float) height);
-        int widthRatio = (int) Math.ceil(options.outWidth / (float) width);
+        Bitmap bitmap = BitmapFactory.decodeFile(imagePath, options);
 
-        if (heightRatio > 1 || widthRatio > 1) {
-            if (heightRatio > widthRatio) {
-                options.inSampleSize = heightRatio;
-            } else {
-                options.inSampleSize = widthRatio;
-            }
+        ByteArrayOutputStream result = new ByteArrayOutputStream();
+        int quality = 100;
+        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, result);
+        if (result.size() > length) {
+            result.reset();
+            quality -= 10;
+            bitmap.compress(Bitmap.CompressFormat.JPEG, quality, result);
         }
-        options.inJustDecodeBounds = false;
 
-        return BitmapFactory.decodeFile(imagePath, options);
-    }
-
-    public static byte[] bmp2ByteArray(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        return stream.toByteArray();
+        bitmap.recycle();
+        return result.toByteArray();
     }
 }
