@@ -18,11 +18,11 @@
 
 免第三方Jar包配置
 
-        compile 'me.shaohui.shareutil:shareutil:1.3.7'
+        compile 'me.shaohui.shareutil:shareutil:1.3.8'
 
 手动添加第三方jar
 
-		compile 'me.shaohui.shareutil:shareutil:1.3.7.no_jar'
+		compile 'me.shaohui.shareutil:shareutil:1.3.8.no_jar'
 
 ### 使用配置
 
@@ -96,7 +96,7 @@
 ## ChangeLog
 
 #### 1.3.8
-- 修复在低端设备上，可能导致的 NullPointException 问题
+- 修复在低端设备上，可能导致的 `NullPointException` 问题
 
 #### 1.3.7
 - 修复微信分享大图没反应bug
