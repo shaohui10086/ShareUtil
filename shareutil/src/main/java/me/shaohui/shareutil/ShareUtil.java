@@ -60,6 +60,12 @@ public class ShareUtil {
     static void action(Activity activity) {
         mShareInstance = getShareInstance(mPlatform, activity);
 
+        // 防止之后调用 NullPointException
+        if (mShareListener == null) {
+            activity.finish();
+            return;
+        }
+
         if (!mShareInstance.isInstall(activity)) {
             mShareListener.shareFailure(new Exception(INFO.NOT_INSTALL));
             activity.finish();

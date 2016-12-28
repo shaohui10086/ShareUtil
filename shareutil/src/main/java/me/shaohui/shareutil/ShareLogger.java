@@ -46,6 +46,7 @@ public class ShareLogger {
         public static final String QQ_LOGIN_ERROR = "QQ login error";
         public static final String QQ_AUTH_SUCCESS = "QQ auth success";
         public static final String WEIBO_AUTH_ERROR = "weibo auth error";
+        public static final String UNKNOW_PLATFORM = "unknown platform";
 
         public static final String WX_ERR_SENT_FAILED = "Wx sent failed";
         public static final String WX_ERR_UNSUPPORT = "Wx UnSupport";

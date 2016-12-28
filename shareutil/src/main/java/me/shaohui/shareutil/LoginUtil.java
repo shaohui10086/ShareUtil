@@ -54,6 +54,9 @@ public class LoginUtil {
             case LoginPlatform.WX:
                 mLoginInstance = new WxLoginInstance(activity, mLoginListener, isFetchUserInfo);
                 break;
+            default:
+                mLoginListener.loginFailure(new Exception(INFO.UNKNOW_PLATFORM));
+                activity.finish();
         }
         mLoginInstance.doLogin(activity, mLoginListener, isFetchUserInfo);
     }

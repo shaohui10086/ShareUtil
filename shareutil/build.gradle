@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
         versionCode 1
-        versionName "1.3.7.no_jar"
+        versionName "1.3.8"
     }
     buildTypes {
         release {
@@ -23,9 +23,9 @@ dependencies {
     compile 'io.reactivex:rxjava:1.2.3'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'com.squareup.okhttp3:okhttp:3.4.2'
-    provided files('libs/open_sdk_r5756_lite.jar')
-    provided files('libs/weiboSDKCore_3.1.4.jar')
-    provided files('libs/libammsdk.jar')
+    compile files('libs/open_sdk_r5756_lite.jar')
+    compile files('libs/weiboSDKCore_3.1.4.jar')
+    compile files('libs/libammsdk.jar')
 }
 
 apply from: 'bintrayUpload.gradle'
