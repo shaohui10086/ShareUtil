@@ -36,6 +36,13 @@
                 android:layout_marginBottom="16dp"
                 android:text="QQ登录"
                 />
+        <Button
+            android:id="@+id/login_fb"
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="16dp"
+            android:text="FaceBook登录"
+            />
     </LinearLayout>
 
 </RelativeLayout>

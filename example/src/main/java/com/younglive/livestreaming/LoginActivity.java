@@ -28,12 +28,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .wxId("XXXXX")
                 .weiboRedirectUrl("XXXXXX")
                 .wxSecret("XXXXXX");
-        ShareManager.init(config);
+        ShareManager.init(this,config);
 
         findViewById(R.id.login_qq).setOnClickListener(this);
         findViewById(R.id.login_weibo).setOnClickListener(this);
         findViewById(R.id.login_wx).setOnClickListener(this);
-
+        findViewById(R.id.login_fb).setOnClickListener(this);
         mLoginListener = new LoginListener() {
             @Override
             public void loginSuccess(LoginResult result) {
@@ -79,6 +79,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.login_wx:
                 LoginUtil.login(this, LoginPlatform.WX, mLoginListener);
+                break;
+            case R.id.login_fb:
+                LoginUtil.login(this, LoginPlatform.FB, mLoginListener);
                 break;
         }
     }

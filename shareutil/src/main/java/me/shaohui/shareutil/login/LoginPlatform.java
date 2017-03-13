@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 public class LoginPlatform {
 
     @Documented
-    @IntDef({QQ, WX, WEIBO})
+    @IntDef({QQ, WX, WEIBO, FB})
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.PARAMETER)
     public @interface Platform {
@@ -26,4 +26,5 @@ public class LoginPlatform {
     public static final int WX = 3;
 
     public static final int WEIBO = 5;
+    public static final int FB = 6;
 }
