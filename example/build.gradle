@@ -21,8 +21,10 @@ android {
         versionName "1.0"
 
         manifestPlaceholders = [
-                qq_id: "XXXXXX"
+                qq_id: "XXXXXX",
+                FACEBOOK_ID:"XXXXXX"
         ]
+        resValue "string", "facebook_app_id", "XXXXXX"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
