@@ -162,6 +162,33 @@
                         android:text="QQ空间"
                         />
             </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/mRlFb"
+                android:layout_weight="1"
+                >
+
+                <ImageView
+                    android:id="@+id/share_facebook"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@mipmap/share_facebook"
+                    />
+
+                <TextView
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:textColor="#CCFFFFFF"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginBottom="17dp"
+                    android:text="FaceBook"
+                    />
+            </RelativeLayout>
         </LinearLayout>
 
     </RelativeLayout>

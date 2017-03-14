@@ -28,6 +28,7 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
         v.findViewById(R.id.share_weibo).setOnClickListener(this);
         v.findViewById(R.id.share_wx).setOnClickListener(this);
         v.findViewById(R.id.share_wx_timeline).setOnClickListener(this);
+        v.findViewById(R.id.share_facebook).setOnClickListener(this);
 
         mShareListener = new ShareListener() {
             @Override
@@ -71,6 +72,10 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
             case R.id.share_wx:
                 ShareUtil.shareMedia(getContext(), SharePlatform.WX, "Title", "summary",
                         "http://www.google.com", "http://shaohui.me/images/avatar.gif",
+                        mShareListener);
+                break;
+            case R.id.share_facebook:
+                ShareUtil.shareImage(getContext(),SharePlatform.FACEBOOK, "http://shaohui.me/images/avatar.gif",
                         mShareListener);
                 break;
         }

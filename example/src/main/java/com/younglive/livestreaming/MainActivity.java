@@ -23,7 +23,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ShareConfig config = ShareConfig.instance().wxId(APP_ID).wxSecret(APP_SECRET);
-        ShareManager.init(config);
+        ShareManager.init(getApplicationContext(), config);
 
         findViewById(R.id.action_login).setOnClickListener(new View.OnClickListener() {
             @Override

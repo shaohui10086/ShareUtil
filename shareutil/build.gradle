@@ -26,6 +26,7 @@ dependencies {
     compile files('libs/open_sdk_r5756_lite.jar')
     compile files('libs/weiboSDKCore_3.1.4.jar')
     compile files('libs/libammsdk.jar')
+    compile 'com.facebook.android:facebook-android-sdk:4.+'
 }
 
 apply from: 'bintrayUpload.gradle'

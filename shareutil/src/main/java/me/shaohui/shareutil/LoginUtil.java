@@ -6,6 +6,7 @@ import android.content.Intent;
 import me.shaohui.shareutil.login.LoginListener;
 import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.login.LoginResult;
+import me.shaohui.shareutil.login.instance.FbLoginInstance;
 import me.shaohui.shareutil.login.instance.LoginInstance;
 import me.shaohui.shareutil.login.instance.QQLoginInstance;
 import me.shaohui.shareutil.login.instance.WeiboLoginInstance;
@@ -53,6 +54,9 @@ public class LoginUtil {
                 break;
             case LoginPlatform.WX:
                 mLoginInstance = new WxLoginInstance(activity, mLoginListener, isFetchUserInfo);
+                break;
+            case LoginPlatform.FB:
+                mLoginInstance=new FbLoginInstance(activity, mLoginListener, isFetchUserInfo);
                 break;
             default:
                 mLoginListener.loginFailure(new Exception(INFO.UNKNOW_PLATFORM));

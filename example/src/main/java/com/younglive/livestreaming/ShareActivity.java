@@ -53,6 +53,6 @@ public class ShareActivity extends AppCompatActivity {
                 .qqId("XXXXXX")
                 .weiboId("XXXXXX")
                 .wxId("xXXXXX");
-        ShareManager.init(config);
+        ShareManager.init(getApplicationContext(), config);
     }
 }

@@ -10,7 +10,7 @@ import java.lang.annotation.RetentionPolicy;
 
 public class SharePlatform {
 
-    @IntDef({ DEFAULT, QQ, QZONE, WEIBO, WX, WX_TIMELINE })
+    @IntDef({ DEFAULT, QQ, QZONE, WEIBO, WX, WX_TIMELINE,FACEBOOK })
     @Retention(RetentionPolicy.SOURCE)
     public @interface Platform{}
 
@@ -20,6 +20,7 @@ public class SharePlatform {
     public static final int WX = 3;
     public static final int WX_TIMELINE = 4;
     public static final int WEIBO = 5;
+    public static final int FACEBOOK = 6;
 
 
 }
