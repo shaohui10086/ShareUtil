@@ -47,7 +47,7 @@ public class _ShareActivity extends Activity {
         } else {
             // handle 微信回调
             LoginUtil.handleResult(-1, -1, getIntent());
-            ShareUtil.handleResult(getIntent());
+            ShareUtil.handleResult(-1, -1, getIntent());
             finish();
         }
     }
@@ -71,7 +71,7 @@ public class _ShareActivity extends Activity {
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(0, 0, intent);
         } else if (mType == ShareUtil.TYPE) {
-            ShareUtil.handleResult(intent);
+            ShareUtil.handleResult(0, 0,intent);
         }
         finish();
     }
@@ -84,7 +84,7 @@ public class _ShareActivity extends Activity {
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(requestCode, resultCode, data);
         } else if (mType == ShareUtil.TYPE) {
-            ShareUtil.handleResult(data);
+            ShareUtil.handleResult(requestCode, resultCode, data);
         }
         finish();
     }

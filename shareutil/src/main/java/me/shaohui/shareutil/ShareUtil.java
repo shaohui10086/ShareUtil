@@ -19,7 +19,9 @@ import me.shaohui.shareutil.login.LoginPlatform;
 import me.shaohui.shareutil.share.ShareImageObject;
 import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
+import me.shaohui.shareutil.share.facebook.FbCallBack;
 import me.shaohui.shareutil.share.instance.DefaultShareInstance;
+import me.shaohui.shareutil.share.instance.FbShareInstance;
 import me.shaohui.shareutil.share.instance.QQShareInstance;
 import me.shaohui.shareutil.share.instance.ShareInstance;
 import me.shaohui.shareutil.share.instance.WeiboShareInstance;
@@ -147,7 +149,11 @@ public class ShareUtil {
         return new ShareListenerProxy(listener);
     }
 
-    public static void handleResult(Intent data) {
+    static int getPlatform(){
+        return mPlatform;
+    }
+
+    private static void handleResult(Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
             mShareInstance.handleResult(data);
@@ -157,6 +163,24 @@ public class ShareUtil {
             }
         } else {
             ShareLogger.e(INFO.UNKNOWN_ERROR);
+        }
+    }
+
+    public static void handleResult(final int requestCode,
+                             final int resultCode, final Intent data){
+        if (mPlatform==SharePlatform.FACEBOOK) {
+            if (mShareInstance != null && data != null) {
+                if (mShareInstance instanceof FbCallBack) {
+                    final FbCallBack fsInstance = (FbCallBack) mShareInstance;
+                    fsInstance.handleResult(requestCode, resultCode, data);
+                }
+            } else if (data == null) {
+                ShareLogger.e(INFO.HANDLE_DATA_NULL);
+            } else {
+                ShareLogger.e(INFO.UNKNOWN_ERROR);
+            }
+        }else{
+            handleResult(data);
         }
     }
 
@@ -171,6 +195,8 @@ public class ShareUtil {
                 return new QQShareInstance(context, ShareManager.CONFIG.getQqId());
             case SharePlatform.WEIBO:
                 return new WeiboShareInstance(context, ShareManager.CONFIG.getWeiboId());
+            case SharePlatform.FACEBOOK:
+                return new FbShareInstance(mShareListener);
             case SharePlatform.DEFAULT:
             default:
                 return new DefaultShareInstance();
@@ -246,7 +272,7 @@ public class ShareUtil {
         IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
     }
-    
+
     private static class ShareListenerProxy extends ShareListener {
 
         private final ShareListener mShareListener;
