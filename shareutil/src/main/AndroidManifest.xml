@@ -10,6 +10,7 @@
             android:allowBackup="true"
             android:label="@string/app_name"
             android:supportsRtl="false"
+
             >
         <activity
                 android:name="com.sina.weibo.sdk.component.WeiboSdkBrowser"
@@ -53,5 +54,5 @@
                 android:exported="true"
                 android:targetActivity="me.shaohui.shareutil._ShareActivity"/>
     </application>
-
+<!--第三次修改-->
 </manifest>
